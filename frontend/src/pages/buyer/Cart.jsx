@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
 import Loading from "../../components/Loading";
 import ErrorMessage from "../../components/ErrorMessage";
 import {
@@ -59,9 +57,9 @@ const Cart = () => {
 
         try {
             setActionLoading(true);
+            setError("");
 
             await removeFromCart(product._id);
-
             await loadCart();
         } catch (error) {
             setError(
@@ -76,9 +74,9 @@ const Cart = () => {
     const handleClearCart = async () => {
         try {
             setActionLoading(true);
+            setError("");
 
             await clearCart();
-
             setCart([]);
         } catch (error) {
             setError(
@@ -94,176 +92,332 @@ const Cart = () => {
         const product = getProduct(item);
         const quantity = getQuantity(item);
 
-        return sum + Number(product.price || 0) * quantity;
+        return (
+            sum +
+            Number(product.price || 0) * quantity
+        );
+    }, 0);
+
+    const totalItems = cart.reduce((sum, item) => {
+        return sum + getQuantity(item);
     }, 0);
 
     if (loading) {
         return (
-            <>
-                <Navbar />
+            <div className="cart-page">
                 <Loading />
-                <Footer />
-            </>
+            </div>
         );
     }
 
     return (
-        <>
-            <Navbar />
+        <div className="cart-page">
 
-            <div className="page-container">
-                <div className="page-header">
-                    <h1>My Cart</h1>
-                    <p>
-                        Review the products you want to purchase.
-                    </p>
+            <div className="cart-container">
+
+                <div className="cart-header">
+                    <div>
+                        <span className="cart-label">
+                            YOUR SHOPPING CART
+                        </span>
+
+                        <h1>My Cart</h1>
+
+                        <p>
+                            Review your selected products
+                            before completing your purchase.
+                        </p>
+                    </div>
+
+                    <div className="cart-count">
+                        <span>🛒</span>
+                        <strong>{totalItems}</strong>
+                        <small>
+                            {totalItems === 1
+                                ? "Item"
+                                : "Items"}
+                        </small>
+                    </div>
                 </div>
 
                 <ErrorMessage message={error} />
 
                 {cart.length === 0 ? (
-                    <div className="empty-state">
+                    <div className="cart-empty">
+
+                        <div className="cart-empty-icon">
+                            🛒
+                        </div>
+
                         <h2>Your Cart is Empty</h2>
 
                         <p>
-                            You haven't added any products to your
-                            cart yet.
+                            Looks like you haven't added
+                            anything to your cart yet.
                         </p>
 
                         <button
+                            className="cart-shop-button"
                             onClick={() =>
                                 navigate("/products")
                             }
                         >
-                            Browse Products
+                            Browse Products →
                         </button>
+
                     </div>
                 ) : (
-                    <>
-                        <div className="cart-list">
-                            {cart.map((item, index) => {
-                                const product = getProduct(item);
-                                const quantity =
-                                    getQuantity(item);
+                    <div className="cart-content">
 
-                                const image =
-                                    product.images &&
-                                    product.images.length > 0
-                                        ? product.images[0]
-                                        : null;
+                        <div className="cart-products">
 
-                                const subtotal =
-                                    Number(product.price || 0) *
-                                    quantity;
+                            <div className="cart-products-header">
+                                <div>
+                                    <h2>
+                                        Cart Items
+                                    </h2>
 
-                                return (
-                                    <div
-                                        className="cart-item"
-                                        key={
-                                            item._id ||
-                                            product._id ||
-                                            index
-                                        }
-                                    >
-                                        <div className="cart-image">
-                                            {image ? (
-                                                <img
-                                                    src={image}
-                                                    alt={
-                                                        product.name
-                                                    }
-                                                />
-                                            ) : (
-                                                <span>📦</span>
-                                            )}
-                                        </div>
+                                    <span>
+                                        {cart.length}{" "}
+                                        {cart.length === 1
+                                            ? "product"
+                                            : "products"}
+                                    </span>
+                                </div>
 
-                                        <div className="cart-info">
-                                            <h3>
-                                                {product.name}
-                                            </h3>
+                                <button
+                                    className="cart-clear-button"
+                                    onClick={handleClearCart}
+                                    disabled={actionLoading}
+                                >
+                                    🗑 Clear Cart
+                                </button>
+                            </div>
 
-                                            <p>
-                                                ₹
-                                                {Number(
-                                                    product.price
-                                                ).toLocaleString(
-                                                    "en-IN"
-                                                )}
-                                            </p>
+                            <div className="cart-items">
 
-                                            <p>
-                                                Quantity:{" "}
-                                                {quantity}
-                                            </p>
+                                {cart.map(
+                                    (item, index) => {
+                                        const product =
+                                            getProduct(item);
 
-                                            <strong>
-                                                Subtotal: ₹
-                                                {subtotal.toLocaleString(
-                                                    "en-IN"
-                                                )}
-                                            </strong>
-                                        </div>
+                                        const quantity =
+                                            getQuantity(item);
 
-                                        <button
-                                            onClick={() =>
-                                                handleRemove(
-                                                    item
-                                                )
-                                            }
-                                            disabled={
-                                                actionLoading
-                                            }
-                                        >
-                                            Remove
-                                        </button>
-                                    </div>
-                                );
-                            })}
+                                        const image =
+                                            product.images &&
+                                            product.images.length > 0
+                                                ? product.images[0]
+                                                : null;
+
+                                        const price =
+                                            Number(
+                                                product.price || 0
+                                            );
+
+                                        const subtotal =
+                                            price * quantity;
+
+                                        return (
+                                            <div
+                                                className="cart-product"
+                                                key={
+                                                    item._id ||
+                                                    product._id ||
+                                                    index
+                                                }
+                                            >
+
+                                                <div className="cart-product-image">
+                                                    {image ? (
+                                                        <img
+                                                            src={image}
+                                                            alt={
+                                                                product.name
+                                                            }
+                                                        />
+                                                    ) : (
+                                                        <span>
+                                                            📦
+                                                        </span>
+                                                    )}
+                                                </div>
+
+                                                <div className="cart-product-info">
+
+                                                    <span className="cart-product-tag">
+                                                        PRODUCT
+                                                    </span>
+
+                                                    <h3>
+                                                        {product.name}
+                                                    </h3>
+
+                                                    <p className="cart-product-price">
+                                                        ₹
+                                                        {price.toLocaleString(
+                                                            "en-IN"
+                                                        )}
+                                                    </p>
+
+                                                    <div className="cart-product-meta">
+                                                        <span>
+                                                            Quantity
+                                                        </span>
+
+                                                        <div className="cart-quantity">
+                                                            {quantity}
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+                                                <div className="cart-product-right">
+
+                                                    <div className="cart-subtotal-label">
+                                                        SUBTOTAL
+                                                    </div>
+
+                                                    <div className="cart-subtotal">
+                                                        ₹
+                                                        {subtotal.toLocaleString(
+                                                            "en-IN"
+                                                        )}
+                                                    </div>
+
+                                                    <button
+                                                        className="cart-remove-button"
+                                                        onClick={() =>
+                                                            handleRemove(
+                                                                item
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            actionLoading
+                                                        }
+                                                    >
+                                                        Remove
+                                                    </button>
+
+                                                </div>
+
+                                            </div>
+                                        );
+                                    }
+                                )}
+
+                            </div>
+
+                            <button
+                                className="cart-continue-button"
+                                onClick={() =>
+                                    navigate("/products")
+                                }
+                            >
+                                ← Continue Shopping
+                            </button>
+
                         </div>
 
-                        <div className="cart-summary">
-                            <h2>Cart Summary</h2>
+                        <aside className="cart-summary">
 
-                            <p>
-                                Items:{" "}
+                            <div className="cart-summary-top">
+                                <span>
+                                    ORDER SUMMARY
+                                </span>
+
+                                <h2>
+                                    Cart Summary
+                                </h2>
+                            </div>
+
+                            <div className="cart-summary-line">
+                                <span>
+                                    Products
+                                </span>
+
                                 <strong>
                                     {cart.length}
                                 </strong>
-                            </p>
-
-                            <h3>
-                                Total: ₹
-                                {total.toLocaleString("en-IN")}
-                            </h3>
-
-                            <div className="cart-actions">
-                                <button
-                                    onClick={handleClearCart}
-                                    disabled={
-                                        actionLoading
-                                    }
-                                >
-                                    Clear Cart
-                                </button>
-
-                                <button
-                                    onClick={() =>
-                                        navigate(
-                                            "/checkout"
-                                        )
-                                    }
-                                >
-                                    Proceed to Checkout
-                                </button>
                             </div>
-                        </div>
-                    </>
+
+                            <div className="cart-summary-line">
+                                <span>
+                                    Total Quantity
+                                </span>
+
+                                <strong>
+                                    {totalItems}
+                                </strong>
+                            </div>
+
+                            <div className="cart-summary-line">
+                                <span>
+                                    Delivery
+                                </span>
+
+                                <strong className="free">
+                                    FREE
+                                </strong>
+                            </div>
+
+                            <div className="cart-summary-divider" />
+
+                            <div className="cart-total">
+                                <div>
+                                    <span>
+                                        Total Amount
+                                    </span>
+
+                                    <small>
+                                        Inclusive of all
+                                        applicable charges
+                                    </small>
+                                </div>
+
+                                <strong>
+                                    ₹
+                                    {total.toLocaleString(
+                                        "en-IN"
+                                    )}
+                                </strong>
+                            </div>
+
+                            <button
+                                className="cart-checkout-button"
+                                onClick={() =>
+                                    navigate(
+                                        "/buyer/checkout"
+                                    )
+                                }
+                            >
+                                Proceed to Checkout
+                                <span>→</span>
+                            </button>
+
+                            <div className="cart-secure">
+                                <span>🔒</span>
+
+                                <div>
+                                    <strong>
+                                        Secure Checkout
+                                    </strong>
+
+                                    <small>
+                                        Your shopping experience
+                                        is protected.
+                                    </small>
+                                </div>
+                            </div>
+
+                        </aside>
+
+                    </div>
                 )}
+
             </div>
 
-            <Footer />
-        </>
+        </div>
     );
 };
 

@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
 import Loading from "../../components/Loading";
 import ErrorMessage from "../../components/ErrorMessage";
 import { getMyOrders } from "../../services/orderApi";
@@ -21,7 +19,11 @@ const Orders = () => {
 
                 const data = await getMyOrders();
 
-                setOrders(Array.isArray(data) ? data : []);
+                setOrders(
+                    Array.isArray(data)
+                        ? data
+                        : data.orders || []
+                );
             } catch (error) {
                 setError(
                     error.response?.data?.message ||
@@ -36,100 +38,141 @@ const Orders = () => {
     }, []);
 
     if (loading) {
-        return (
-            <>
-                <Navbar />
-                <Loading />
-                <Footer />
-            </>
-        );
+        return <Loading />;
     }
 
     return (
-        <>
-            <Navbar />
+        <div className="page-container orders-page">
+            <div className="page-header orders-header">
+                <div>
+                    <span className="orders-label">
+                        YOUR PURCHASES
+                    </span>
 
-            <div className="page-container">
-                <div className="page-header">
                     <h1>My Orders</h1>
-                    <p>View and track your purchases.</p>
+
+                    <p>
+                        View and track all your purchases
+                        in one place.
+                    </p>
                 </div>
 
-                <ErrorMessage message={error} />
-
-                {orders.length === 0 ? (
-                    <div className="empty-state">
-                        <h2>No Orders Yet</h2>
-
-                        <p>
-                            Your placed orders will appear here.
-                        </p>
-
-                        <button
-                            onClick={() =>
-                                navigate("/products")
-                            }
-                        >
-                            Start Shopping
-                        </button>
-                    </div>
-                ) : (
-                    <div className="orders-list">
-                        {orders.map((order) => (
-                            <div
-                                className="order-card"
-                                key={order._id}
-                            >
-                                <div>
-                                    <h3>
-                                        Order #
-                                        {order._id.slice(-8)}
-                                    </h3>
-
-                                    <p>
-                                        Status:{" "}
-                                        <strong>
-                                            {order.orderStatus}
-                                        </strong>
-                                    </p>
-
-                                    <p>
-                                        Payment:{" "}
-                                        {order.paymentMethod}
-                                    </p>
-
-                                    <p>
-                                        Items:{" "}
-                                        {order.items?.length || 0}
-                                    </p>
-
-                                    <h3>
-                                        Total: ₹
-                                        {Number(
-                                            order.totalAmount
-                                        ).toLocaleString(
-                                            "en-IN"
-                                        )}
-                                    </h3>
-                                </div>
-
-                                <button
-                                    onClick={() =>
-                                        navigate(
-                                            `/orders/${order._id}`
-                                        )
-                                    }
-                                >
-                                    View Details
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                )}
+                <div className="orders-header-icon">
+                    📦
+                </div>
             </div>
 
-            <Footer />
-        </>
+            <ErrorMessage message={error} />
+
+            {orders.length === 0 ? (
+                <div className="empty-state orders-empty">
+                    <div className="orders-empty-icon">
+                        📦
+                    </div>
+
+                    <h2>No Orders Yet</h2>
+
+                    <p>
+                        Your placed orders will appear here.
+                    </p>
+
+                    <button
+                        onClick={() =>
+                            navigate("/products")
+                        }
+                    >
+                        Start Shopping →
+                    </button>
+                </div>
+            ) : (
+                <div className="orders-list">
+                    {orders.map((order) => (
+                        <div
+                            className="order-card"
+                            key={order._id}
+                        >
+                            <div className="order-card-content">
+                                <div className="order-card-heading">
+                                    <div>
+                                        <span className="order-small-label">
+                                            ORDER
+                                        </span>
+
+                                        <h3>
+                                            #{order._id.slice(-8)}
+                                        </h3>
+                                    </div>
+
+                                    <div className="order-icon">
+                                        📦
+                                    </div>
+                                </div>
+
+                                <div className="order-details">
+                                    <div className="order-detail">
+                                        <span>
+                                            Status
+                                        </span>
+
+                                        <strong className="order-status">
+                                            {order.orderStatus}
+                                        </strong>
+                                    </div>
+
+                                    <div className="order-detail">
+                                        <span>
+                                            Payment
+                                        </span>
+
+                                        <strong>
+                                            {order.paymentMethod}
+                                        </strong>
+                                    </div>
+
+                                    <div className="order-detail">
+                                        <span>
+                                            Items
+                                        </span>
+
+                                        <strong>
+                                            {order.items?.length || 0}
+                                        </strong>
+                                    </div>
+                                </div>
+
+                                <div className="order-bottom">
+                                    <div>
+                                        <span>
+                                            TOTAL AMOUNT
+                                        </span>
+
+                                        <strong>
+                                            ₹
+                                            {Number(
+                                                order.totalAmount
+                                            ).toLocaleString(
+                                                "en-IN"
+                                            )}
+                                        </strong>
+                                    </div>
+
+                                    <button
+                                        onClick={() =>
+                                            navigate(
+                                                `/buyer/orders/${order._id}`
+                                            )
+                                        }
+                                    >
+                                        View Details
+                                        <span>→</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
     );
 };
 

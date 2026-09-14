@@ -10,6 +10,7 @@ import "./styles/products.css";
 import "./styles/auth.css";
 import "./styles/dashboard.css";
 import "./styles/responsive.css";
+import "./styles/cart.css";
 
 import App from "./App.jsx";
 
