@@ -5,6 +5,11 @@ export const getUsers = async () => {
     return response.data;
 };
 
+export const getAllProducts = async () => {
+    const response = await api.get("/admin/products");
+    return response.data;
+};
+
 export const updateUserRole = async (id, role) => {
     const response = await api.put(`/admin/users/${id}/role`, {
         role

@@ -44,6 +44,21 @@ const updateUserRole = async (req, res) => {
     }
 };
 
+const getAllProducts = async (req, res) => {
+    try {
+        const products = await Product.find()
+            .populate("seller", "name email")
+            .populate("category", "name");
+
+        res.json(products);
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to get products",
+            error: error.message
+        });
+    }
+};
+
 const updateProductStatus = async (req, res) => {
     try {
         const product = await Product.findByIdAndUpdate(
@@ -54,7 +69,9 @@ const updateProductStatus = async (req, res) => {
             {
                 new: true
             }
-        );
+        )
+            .populate("seller", "name email")
+            .populate("category", "name");
 
         if (!product) {
             return res.status(404).json({
@@ -77,5 +94,6 @@ const updateProductStatus = async (req, res) => {
 module.exports = {
     getUsers,
     updateUserRole,
+    getAllProducts,
     updateProductStatus
 };

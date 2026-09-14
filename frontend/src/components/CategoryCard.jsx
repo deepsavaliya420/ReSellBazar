@@ -40,6 +40,10 @@ const CategoryCard = ({ category }) => {
             return "⚽";
         }
 
+        if (categoryName === "furniture") {
+            return "🪑";
+        }
+
         return "🛍️";
     };
 

@@ -4,9 +4,7 @@ import Footer from "../../components/Footer";
 import Loading from "../../components/Loading";
 import ErrorMessage from "../../components/ErrorMessage";
 import {
-    getProducts
-} from "../../services/productApi";
-import {
+    getAllProducts,
     updateProductStatus
 } from "../../services/adminApi";
 
@@ -17,7 +15,7 @@ const ManageProducts = () => {
 
     const loadProducts = async () => {
         try {
-            const data = await getProducts();
+            const data = await getAllProducts();
 
             setProducts(
                 data.products ||
@@ -40,11 +38,10 @@ const ManageProducts = () => {
 
     const handleStatus = async (id, status) => {
         try {
-            const data =
-                await updateProductStatus(
-                    id,
-                    status
-                );
+            const data = await updateProductStatus(
+                id,
+                status
+            );
 
             setProducts((current) =>
                 current.map((product) =>
@@ -76,6 +73,7 @@ const ManageProducts = () => {
             <Navbar />
 
             <div className="page-container">
+
                 <div className="page-header">
                     <h1>Manage Products</h1>
                 </div>
@@ -83,35 +81,40 @@ const ManageProducts = () => {
                 <ErrorMessage message={error} />
 
                 <div className="products">
+
                     {products.map((product) => (
                         <div
                             className="product-card"
                             key={product._id}
                         >
                             <div className="product-image">
+
                                 {product.images?.[0] ? (
                                     <img
-                                        src={
-                                            product.images[0]
-                                        }
-                                        alt={
-                                            product.name
-                                        }
+                                        src={product.images[0]}
+                                        alt={product.name}
                                     />
                                 ) : (
                                     <span>📦</span>
                                 )}
+
                             </div>
 
                             <div className="product-info">
+
                                 <h3>
                                     {product.name}
                                 </h3>
 
                                 <p>
+                                    Category:{" "}
+                                    {product.category?.name ||
+                                        "Unknown"}
+                                </p>
+
+                                <p>
                                     Seller:{" "}
-                                    {product.seller
-                                        ?.name ||
+                                    {product.seller?.name ||
                                         "Unknown"}
                                 </p>
 
@@ -119,9 +122,7 @@ const ManageProducts = () => {
                                     ₹
                                     {Number(
                                         product.price
-                                    ).toLocaleString(
-                                        "en-IN"
-                                    )}
+                                    ).toLocaleString("en-IN")}
                                 </p>
 
                                 <p>
@@ -136,6 +137,10 @@ const ManageProducts = () => {
                                             "approved"
                                         )
                                     }
+                                    disabled={
+                                        product.status ===
+                                        "approved"
+                                    }
                                 >
                                     Approve
                                 </button>
@@ -147,13 +152,20 @@ const ManageProducts = () => {
                                             "rejected"
                                         )
                                     }
+                                    disabled={
+                                        product.status ===
+                                        "rejected"
+                                    }
                                 >
                                     Reject
                                 </button>
+
                             </div>
                         </div>
                     ))}
+
                 </div>
+
             </div>
 
             <Footer />

@@ -35,11 +35,30 @@ const Home = () => {
                     []
                 );
 
-                setCategories(
+                const categoryList =
                     categoriesData.categories ||
                     categoriesData ||
-                    []
-                );
+                    [];
+
+                const mainCategories = [
+                    "Electronics",
+                    "Fashion",
+                    "Home & Living",
+                    "Beauty & Health",
+                    "Sports & Fitness",
+                    "Furniture"
+                ];
+
+                const filteredCategories =
+                    Array.isArray(categoryList)
+                        ? categoryList.filter((category) =>
+                              mainCategories.includes(
+                                  category.name
+                              )
+                          )
+                        : [];
+
+                setCategories(filteredCategories);
             } catch (error) {
                 setError(
                     error.response?.data?.message ||
@@ -101,17 +120,15 @@ const Home = () => {
                     <Loading />
                 ) : (
                     <div className="categories">
-                        {categories
-                            .slice(0, 6)
-                            .map((category) => (
-                                <CategoryCard
-                                    key={
-                                        category._id ||
-                                        category.name
-                                    }
-                                    category={category}
-                                />
-                            ))}
+                        {categories.map((category) => (
+                            <CategoryCard
+                                key={
+                                    category._id ||
+                                    category.name
+                                }
+                                category={category}
+                            />
+                        ))}
                     </div>
                 )}
             </section>

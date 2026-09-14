@@ -2,6 +2,29 @@ const Product = require("../models/Product");
 
 const createProduct = async (req, res) => {
     try {
+        if (Array.isArray(req.body)) {
+            const products = req.body.map((product) => ({
+                seller: req.user.id,
+                name: product.name,
+                description: product.description,
+                category: product.category,
+                price: product.price,
+                condition: product.condition,
+                quantity: product.quantity,
+                images: product.images || [],
+                status: "approved"
+            }));
+
+            const createdProducts =
+                await Product.insertMany(products);
+
+            return res.status(201).json({
+                message: "Products created successfully",
+                count: createdProducts.length,
+                products: createdProducts
+            });
+        }
+
         const product = await Product.create({
             seller: req.user.id,
             name: req.body.name,
@@ -10,7 +33,8 @@ const createProduct = async (req, res) => {
             price: req.body.price,
             condition: req.body.condition,
             quantity: req.body.quantity,
-            images: req.body.images || []
+            images: req.body.images || [],
+            status: "approved"
         });
 
         res.status(201).json({
@@ -30,8 +54,8 @@ const getProducts = async (req, res) => {
         const products = await Product.find({
             status: "approved"
         })
-        .populate("seller", "name email")
-        .populate("category", "name");
+            .populate("seller", "name email")
+            .populate("category", "name");
 
         res.json(products);
     } catch (error) {
