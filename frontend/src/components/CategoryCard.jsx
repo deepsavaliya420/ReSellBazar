@@ -8,6 +8,41 @@ const CategoryCard = ({ category }) => {
             ? category
             : category?.name;
 
+    const getCategoryIcon = (name) => {
+        const categoryName = name?.toLowerCase().trim();
+
+        if (categoryName === "electronics") {
+            return "📺";
+        }
+
+        if (categoryName === "fashion") {
+            return "👕";
+        }
+
+        if (
+            categoryName === "home & living" ||
+            categoryName === "home and living"
+        ) {
+            return "🛋️";
+        }
+
+        if (
+            categoryName === "beauty & health" ||
+            categoryName === "beauty and health"
+        ) {
+            return "💄";
+        }
+
+        if (
+            categoryName === "sports & fitness" ||
+            categoryName === "sports and fitness"
+        ) {
+            return "⚽";
+        }
+
+        return "🛍️";
+    };
+
     return (
         <div
             className="category-card"
@@ -20,20 +55,12 @@ const CategoryCard = ({ category }) => {
             }
         >
             <div className="category-icon">
-                🛍️
+                {getCategoryIcon(categoryName)}
             </div>
 
-            <div className="category-content">
-                <h3>{categoryName}</h3>
+            <h3>{categoryName}</h3>
 
-                <p>
-                    Explore {categoryName}
-                </p>
-
-                <span className="category-arrow">
-                    →
-                </span>
-            </div>
+            <p>Explore {categoryName}</p>
         </div>
     );
 };
