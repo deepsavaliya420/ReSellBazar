@@ -1,0 +1,253 @@
+/* ========================================
+   LARGE DESKTOP
+======================================== */
+
+@media (max-width: 1250px) {
+    .products {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .products-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .dashboard-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .dashboard-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .categories {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .hero-content {
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+
+    .section {
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+}
+
+/* ========================================
+   TABLET / SMALL DESKTOP
+======================================== */
+
+@media (max-width: 1000px) {
+    .navbar-container {
+        padding: 0 20px;
+    }
+
+    .navbar-links > a {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .section {
+        padding-left: 25px;
+        padding-right: 25px;
+    }
+
+    .hero-content {
+        padding-left: 25px;
+        padding-right: 25px;
+    }
+
+    .products,
+    .products-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .categories {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .dashboard-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .product-details {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========================================
+   MOBILE NAVBAR / DASHBOARD
+======================================== */
+
+@media (max-width: 850px) {
+    .navbar-container {
+        min-height: 65px;
+    }
+
+    .navbar-links {
+        display: none;
+    }
+
+    .navbar-menu-button {
+        display: block;
+    }
+
+    .dashboard-container {
+        display: block;
+    }
+
+    .dashboard-sidebar {
+        position: static;
+        top: auto;
+        width: 100%;
+        height: auto;
+        min-height: auto;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .dashboard-main {
+        width: 100%;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .products,
+    .products-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .product-details {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========================================
+   MOBILE
+======================================== */
+
+@media (max-width: 650px) {
+    .products,
+    .products-grid,
+    .categories,
+    .category-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .hero {
+        min-height: 470px;
+    }
+
+    .hero-content {
+        padding: 60px 20px;
+    }
+
+    .hero-content h1 {
+        font-size: 42px;
+    }
+
+    .hero-content p {
+        font-size: 16px;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+        width: 100%;
+    }
+
+    .section {
+        padding: 45px 20px;
+    }
+
+    .section-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .auction-section {
+        margin-left: 15px;
+        margin-right: 15px;
+        padding: 35px 25px;
+    }
+
+    .page-container {
+        padding: 30px 15px;
+    }
+
+    .page-header h1 {
+        font-size: 28px;
+    }
+
+    .product-card-image {
+        height: 240px;
+    }
+}
+
+/* ========================================
+   SMALL MOBILE
+======================================== */
+
+@media (max-width: 450px) {
+    .hero {
+        min-height: 450px;
+    }
+
+    .hero-content {
+        padding: 55px 18px;
+    }
+
+    .hero-content h1 {
+        font-size: 36px;
+    }
+
+    .section {
+        padding: 38px 16px;
+    }
+
+    .navbar-container {
+        padding: 0 14px;
+    }
+
+    .navbar-logo,
+    .navbar-brand {
+        font-size: 20px;
+    }
+
+    .product-details {
+        padding: 15px;
+    }
+
+    .dashboard-main {
+        padding: 15px;
+    }
+
+    .buyer-dashboard-header {
+        padding: 24px;
+    }
+
+    .dashboard-card {
+        min-height: 190px;
+    }
+
+    .auction-section {
+        margin-left: 10px;
+        margin-right: 10px;
+        padding: 30px 22px;
+    }
+}

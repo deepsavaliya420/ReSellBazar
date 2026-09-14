@@ -16,6 +16,7 @@ const Register = () => {
 
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState("");
 
     const handleChange = (e) => {
         setFormData({
@@ -27,19 +28,20 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        setError("");
-        setLoading(true);
-
         try {
-            const data = await register(formData);
+            setLoading(true);
+            setError("");
+            setSuccess("");
 
-            const role = data.user?.role || formData.role;
+            await register(formData);
 
-            if (role === "seller") {
-                navigate("/seller");
-            } else {
-                navigate("/buyer");
-            }
+            setSuccess(
+                "Registration successful. Please login."
+            );
+
+            setTimeout(() => {
+                navigate("/login");
+            }, 1000);
         } catch (error) {
             setError(
                 error.response?.data?.message ||
@@ -53,10 +55,11 @@ const Register = () => {
     return (
         <div className="auth-page">
             <div className="auth-card">
-
                 <h1>Create Account</h1>
 
-                <p>Join ReSellBazar today</p>
+                <p>
+                    Join ReSellBazar today.
+                </p>
 
                 {error && (
                     <div className="error-message">
@@ -64,12 +67,16 @@ const Register = () => {
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit}>
+                {success && (
+                    <div className="success-message">
+                        {success}
+                    </div>
+                )}
 
+                <form onSubmit={handleSubmit}>
                     <label>Name</label>
 
                     <input
-                        type="text"
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
@@ -91,11 +98,10 @@ const Register = () => {
                     <label>Mobile</label>
 
                     <input
-                        type="tel"
                         name="mobile"
                         value={formData.mobile}
                         onChange={handleChange}
-                        placeholder="Enter your mobile number"
+                        placeholder="Enter mobile number"
                         required
                     />
 
@@ -106,7 +112,7 @@ const Register = () => {
                         name="password"
                         value={formData.password}
                         onChange={handleChange}
-                        placeholder="Enter password"
+                        placeholder="Create password"
                         required
                     />
 
@@ -134,7 +140,6 @@ const Register = () => {
                             ? "Creating Account..."
                             : "Register"}
                     </button>
-
                 </form>
 
                 <p className="auth-link">
@@ -143,7 +148,6 @@ const Register = () => {
                         Login
                     </Link>
                 </p>
-
             </div>
         </div>
     );

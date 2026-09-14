@@ -1,0 +1,232 @@
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+    background: rgba(15, 23, 42, 0.96);
+    color: #ffffff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.12);
+    backdrop-filter: blur(12px);
+}
+
+.navbar-container {
+    width: 100%;
+    max-width: 1450px;
+    min-height: 72px;
+    margin: 0 auto;
+    padding: 0 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+}
+
+.navbar-logo,
+.navbar-brand {
+    position: relative;
+    flex-shrink: 0;
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    transition: 0.2s ease;
+}
+
+.navbar-logo::after,
+.navbar-brand::after {
+    content: "";
+    display: block;
+    width: 28px;
+    height: 3px;
+    margin-top: 3px;
+    border-radius: 5px;
+    background: #818cf8;
+}
+
+.navbar-logo:hover,
+.navbar-brand:hover {
+    color: #c7d2fe;
+}
+
+.navbar-links {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.navbar-links > a {
+    position: relative;
+    padding: 10px 12px;
+    color: #cbd5e1;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.navbar-links > a::after {
+    content: "";
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 4px;
+    height: 2px;
+    border-radius: 5px;
+    background: #818cf8;
+    transform: scaleX(0);
+    transition: transform 0.2s ease;
+}
+
+.navbar-links > a:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.navbar-links > a:hover::after {
+    transform: scaleX(1);
+}
+
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.navbar-actions a,
+.navbar-actions button {
+    border: none;
+    border-radius: 9px;
+    padding: 9px 15px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.navbar-login {
+    color: #ffffff;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+
+.navbar-login:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.navbar-register {
+    color: #ffffff;
+    background: linear-gradient(
+        135deg,
+        #6366f1,
+        #4f46e5
+    );
+    box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3);
+}
+
+.navbar-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 9px 20px rgba(79, 70, 229, 0.4);
+}
+
+.navbar-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 5px;
+    padding-left: 10px;
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.navbar-user-name {
+    max-width: 150px;
+    overflow: hidden;
+    color: #e2e8f0;
+    font-size: 13px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.navbar-logout {
+    border: none;
+    border-radius: 8px;
+    padding: 9px 15px;
+    background: #ef4444;
+    color: #ffffff;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.navbar-logout:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(239, 68, 68, 0.25);
+}
+
+.navbar-menu-button {
+    display: none;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    font-size: 24px;
+}
+
+@media (max-width: 1100px) {
+    .navbar-container {
+        padding: 0 20px;
+    }
+
+    .navbar-links {
+        gap: 2px;
+    }
+
+    .navbar-links > a {
+        padding: 9px 8px;
+    }
+}
+
+@media (max-width: 850px) {
+    .navbar-container {
+        min-height: 65px;
+    }
+
+    .navbar-links {
+        display: none;
+    }
+
+    .navbar-actions {
+        display: flex;
+    }
+
+    .navbar-menu-button {
+        display: block;
+    }
+}
+
+@media (max-width: 600px) {
+    .navbar-container {
+        padding: 0 16px;
+    }
+
+    .navbar-logo,
+    .navbar-brand {
+        font-size: 20px;
+    }
+
+    .navbar-actions {
+        gap: 6px;
+    }
+
+    .navbar-actions a,
+    .navbar-actions button {
+        padding: 8px 11px;
+        font-size: 13px;
+    }
+
+    .navbar-user-name {
+        display: none;
+    }
+}

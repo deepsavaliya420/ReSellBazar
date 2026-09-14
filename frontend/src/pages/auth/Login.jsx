@@ -1,9 +1,15 @@
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+    Link,
+    useLocation,
+    useNavigate
+} from "react-router-dom";
+
 import { useAuth } from "../../context/AuthContext";
 
 const Login = () => {
     const { login } = useAuth();
+
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -55,10 +61,11 @@ const Login = () => {
     return (
         <div className="auth-page">
             <div className="auth-card">
-
                 <h1>Welcome Back</h1>
 
-                <p>Login to your ReSellBazar account</p>
+                <p>
+                    Login to your ReSellBazar account
+                </p>
 
                 {error && (
                     <div className="error-message">
@@ -67,10 +74,12 @@ const Login = () => {
                 )}
 
                 <form onSubmit={handleSubmit}>
-
-                    <label>Email</label>
+                    <label htmlFor="email">
+                        Email
+                    </label>
 
                     <input
+                        id="email"
                         type="email"
                         name="email"
                         value={formData.email}
@@ -79,9 +88,12 @@ const Login = () => {
                         required
                     />
 
-                    <label>Password</label>
+                    <label htmlFor="password">
+                        Password
+                    </label>
 
                     <input
+                        id="password"
                         type="password"
                         name="password"
                         value={formData.password}
@@ -94,9 +106,10 @@ const Login = () => {
                         type="submit"
                         disabled={loading}
                     >
-                        {loading ? "Logging in..." : "Login"}
+                        {loading
+                            ? "Logging in..."
+                            : "Login"}
                     </button>
-
                 </form>
 
                 <p className="auth-link">
@@ -105,7 +118,6 @@ const Login = () => {
                         Register
                     </Link>
                 </p>
-
             </div>
         </div>
     );

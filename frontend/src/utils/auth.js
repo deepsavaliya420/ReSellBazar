@@ -1,14 +1,17 @@
+const TOKEN_KEY = "token";
+const USER_KEY = "user";
+
 export const saveAuthData = (token, user) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
 };
 
 export const getToken = () => {
-    return localStorage.getItem("token");
+    return localStorage.getItem(TOKEN_KEY);
 };
 
 export const getUser = () => {
-    const user = localStorage.getItem("user");
+    const user = localStorage.getItem(USER_KEY);
 
     if (!user) {
         return null;
@@ -16,16 +19,17 @@ export const getUser = () => {
 
     try {
         return JSON.parse(user);
-    } catch {
+    } catch (error) {
+        localStorage.removeItem(USER_KEY);
         return null;
     }
 };
 
 export const removeAuthData = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
 };
 
-export const isLoggedIn = () => {
-    return Boolean(localStorage.getItem("token"));
+export const isAuthenticated = () => {
+    return Boolean(getToken());
 };

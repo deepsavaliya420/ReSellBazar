@@ -1,9 +1,16 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useState
+} from "react";
+
 import {
     registerUser,
     loginUser,
     getProfile
 } from "../services/authApi";
+
 import {
     saveAuthData,
     getToken,
@@ -11,7 +18,7 @@ import {
     removeAuthData
 } from "../utils/auth";
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(getUser());
@@ -29,7 +36,8 @@ export const AuthProvider = ({ children }) => {
             try {
                 const data = await getProfile();
 
-                const loggedInUser = data.user || data;
+                const loggedInUser =
+                    data.user || data;
 
                 setUser(loggedInUser);
 
@@ -51,8 +59,12 @@ export const AuthProvider = ({ children }) => {
     const register = async (userData) => {
         const data = await registerUser(userData);
 
-        if (data.token) {
-            saveAuthData(data.token, data.user);
+        if (data.token && data.user) {
+            saveAuthData(
+                data.token,
+                data.user
+            );
+
             setUser(data.user);
         }
 
@@ -62,8 +74,12 @@ export const AuthProvider = ({ children }) => {
     const login = async (userData) => {
         const data = await loginUser(userData);
 
-        if (data.token) {
-            saveAuthData(data.token, data.user);
+        if (data.token && data.user) {
+            saveAuthData(
+                data.token,
+                data.user
+            );
+
             setUser(data.user);
         }
 
