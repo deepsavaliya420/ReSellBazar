@@ -3,7 +3,9 @@ const Auction = require("../models/Auction");
 
 const placeBid = async (req, res) => {
     try {
-        const auction = await Auction.findById(req.body.auction);
+        const auction = await Auction.findById(
+            req.body.auction
+        );
 
         if (!auction) {
             return res.status(404).json({
@@ -13,33 +15,54 @@ const placeBid = async (req, res) => {
 
         const now = new Date();
 
-        if (now < auction.startTime || now > auction.endTime) {
+        if (
+            now < auction.startTime ||
+            now >= auction.endTime
+        ) {
             return res.status(400).json({
                 message: "Auction is not active"
             });
         }
 
-        if (req.body.amount <= auction.currentPrice) {
+        if (auction.status === "ended") {
             return res.status(400).json({
-                message: "Bid must be greater than current price"
+                message: "Auction has ended"
+            });
+        }
+
+        if (auction.status === "cancelled") {
+            return res.status(400).json({
+                message: "Auction has been cancelled"
+            });
+        }
+
+        if (
+            Number(req.body.amount) <=
+            Number(auction.currentPrice)
+        ) {
+            return res.status(400).json({
+                message:
+                    "Bid must be greater than current price"
             });
         }
 
         const bid = await Bid.create({
             auction: auction._id,
             buyer: req.user.id,
-            amount: req.body.amount
+            amount: Number(req.body.amount)
         });
 
-        auction.currentPrice = req.body.amount;
+        auction.currentPrice =
+            Number(req.body.amount);
+
         auction.status = "active";
-        auction.winner = req.user.id;
 
         await auction.save();
 
         res.status(201).json({
             message: "Bid placed successfully",
-            bid
+            bid,
+            currentPrice: auction.currentPrice
         });
     } catch (error) {
         res.status(500).json({
@@ -54,10 +77,11 @@ const getBids = async (req, res) => {
         const bids = await Bid.find({
             auction: req.params.auctionId
         })
-        .populate("buyer", "name email")
-        .sort({
-            amount: -1
-        });
+            .populate("buyer", "name email")
+            .sort({
+                amount: -1,
+                createdAt: 1
+            });
 
         res.json(bids);
     } catch (error) {

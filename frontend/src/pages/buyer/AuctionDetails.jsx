@@ -1,40 +1,61 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
+import {
+    Link,
+    useParams
+} from "react-router-dom";
+
 import Loading from "../../components/Loading";
 import ErrorMessage from "../../components/ErrorMessage";
+
 import {
     getAuctionById
 } from "../../services/auctionApi";
+
 import {
     createBid,
     getAuctionBids
 } from "../../services/bidApi";
 
+import "../../styles/auction.css";
+
 const AuctionDetails = () => {
     const { id } = useParams();
 
-    const [auction, setAuction] = useState(null);
-    const [bids, setBids] = useState([]);
-    const [amount, setAmount] = useState("");
+    const [auction, setAuction] =
+        useState(null);
 
-    const [loading, setLoading] = useState(true);
-    const [bidLoading, setBidLoading] = useState(false);
+    const [bids, setBids] =
+        useState([]);
 
-    const [error, setError] = useState("");
-    const [message, setMessage] = useState("");
+    const [amount, setAmount] =
+        useState("");
+
+    const [loading, setLoading] =
+        useState(true);
+
+    const [bidLoading, setBidLoading] =
+        useState(false);
+
+    const [error, setError] =
+        useState("");
+
+    const [message, setMessage] =
+        useState("");
 
     const loadData = async () => {
         try {
             setLoading(true);
+            setError("");
 
             const auctionData =
                 await getAuctionById(id);
 
-            setAuction(
+            const auctionResult =
                 auctionData.auction ||
-                auctionData
+                auctionData;
+
+            setAuction(
+                auctionResult
             );
 
             const bidData =
@@ -45,6 +66,7 @@ const AuctionDetails = () => {
                     ? bidData
                     : bidData.bids || []
             );
+
         } catch (error) {
             setError(
                 error.response?.data?.message ||
@@ -59,29 +81,39 @@ const AuctionDetails = () => {
         loadData();
     }, [id]);
 
-    const handleBid = async (e) => {
-        e.preventDefault();
+    const handleBid = async (event) => {
+        event.preventDefault();
 
-        if (!amount || Number(amount) <= 0) {
-            setError("Enter a valid bid amount.");
+        setError("");
+        setMessage("");
+
+        if (
+            !amount ||
+            Number(amount) <= 0
+        ) {
+            setError(
+                "Enter a valid bid amount."
+            );
             return;
         }
 
         if (
             auction &&
             Number(amount) <=
-                Number(auction.currentPrice)
+                Number(
+                    auction.currentPrice
+                )
         ) {
             setError(
-                `Your bid must be greater than ₹${auction.currentPrice}.`
+                `Your bid must be greater than ₹${Number(
+                    auction.currentPrice
+                ).toLocaleString("en-IN")}.`
             );
             return;
         }
 
         try {
             setBidLoading(true);
-            setError("");
-            setMessage("");
 
             await createBid({
                 auction: id,
@@ -89,9 +121,13 @@ const AuctionDetails = () => {
             });
 
             setAmount("");
-            setMessage("Bid placed successfully.");
+
+            setMessage(
+                "Bid placed successfully."
+            );
 
             await loadData();
+
         } catch (error) {
             setError(
                 error.response?.data?.message ||
@@ -104,32 +140,77 @@ const AuctionDetails = () => {
 
     if (loading) {
         return (
-            <>
-                <Navbar />
+            <main className="auction-page">
                 <Loading />
-                <Footer />
-            </>
+            </main>
         );
     }
 
     if (!auction) {
         return (
-            <>
-                <Navbar />
-                <main className="page-container">
-                    <h1>Auction Not Found</h1>
-                </main>
-                <Footer />
-            </>
+            <main className="auction-page">
+
+                <div className="auction-empty">
+
+                    <div className="auction-empty-icon">
+                        🏷️
+                    </div>
+
+                    <h2>
+                        Auction Not Found
+                    </h2>
+
+                    <p>
+                        The auction you are
+                        looking for does not
+                        exist.
+                    </p>
+
+                    <Link
+                        to="/buyer/auctions"
+                        className="auction-create-button"
+                    >
+                        Back to Auctions
+                    </Link>
+
+                </div>
+
+            </main>
         );
     }
 
-    return (
-        <>
-            <Navbar />
+    const product =
+        auction.product || {};
 
-            <main className="page-container">
-                <ErrorMessage message={error} />
+    const image =
+        product.images?.length > 0
+            ? product.images[0]
+            : null;
+
+    const isActive =
+        auction.status === "active";
+
+    const isUpcoming =
+        auction.status === "upcoming";
+
+    const isEnded =
+        auction.status === "ended";
+
+    return (
+        <main className="auction-page">
+
+            <div className="auction-details">
+
+                <Link
+                    to="/buyer/auctions"
+                    className="auction-back-link"
+                >
+                    ← Back to Auctions
+                </Link>
+
+                <ErrorMessage
+                    message={error}
+                />
 
                 {message && (
                     <div className="success-message">
@@ -137,121 +218,393 @@ const AuctionDetails = () => {
                     </div>
                 )}
 
-                <div className="auction-details">
-                    <h1>
-                        {auction.product?.name ||
-                            "Auction"}
-                    </h1>
+                <div className="auction-details-card">
 
-                    <p>
-                        Seller:{" "}
-                        {auction.seller?.name ||
-                            "Seller"}
-                    </p>
+                    <div className="auction-details-image">
 
-                    <p>
-                        Starting Price: ₹
-                        {auction.startingPrice}
-                    </p>
+                        {image ? (
 
-                    <p>
-                        Current Price: ₹
-                        {auction.currentPrice}
-                    </p>
-
-                    <p>
-                        Status: {auction.status}
-                    </p>
-
-                    <p>
-                        Start:{" "}
-                        {new Date(
-                            auction.startTime
-                        ).toLocaleString("en-IN")}
-                    </p>
-
-                    <p>
-                        End:{" "}
-                        {new Date(
-                            auction.endTime
-                        ).toLocaleString("en-IN")}
-                    </p>
-
-                    {auction.status === "active" && (
-                        <form onSubmit={handleBid}>
-                            <h2>Place Your Bid</h2>
-
-                            <input
-                                type="number"
-                                min={
-                                    Number(
-                                        auction.currentPrice
-                                    ) + 1
+                            <img
+                                src={image}
+                                alt={
+                                    product.name ||
+                                    "Auction Product"
                                 }
-                                value={amount}
-                                onChange={(e) =>
-                                    setAmount(
-                                        e.target.value
-                                    )
-                                }
-                                placeholder={`More than ₹${auction.currentPrice}`}
-                                required
+                                onError={(event) => {
+                                    event.currentTarget.style.display =
+                                        "none";
+
+                                    if (
+                                        event.currentTarget
+                                            .nextElementSibling
+                                    ) {
+                                        event.currentTarget
+                                            .nextElementSibling
+                                            .style.display =
+                                            "flex";
+                                    }
+                                }}
                             />
 
-                            <button
-                                type="submit"
-                                disabled={bidLoading}
-                            >
-                                {bidLoading
-                                    ? "Placing Bid..."
-                                    : "Place Bid"}
-                            </button>
-                        </form>
-                    )}
+                        ) : null}
 
-                    <h2>Bid History</h2>
+                        <div
+                            className="auction-image-fallback"
+                            style={{
+                                display: image
+                                    ? "none"
+                                    : "flex"
+                            }}
+                        >
+                            🏷️
+                            <span>
+                                No Image
+                            </span>
+                        </div>
 
-                    {bids.length === 0 ? (
-                        <p>No bids yet.</p>
-                    ) : (
-                        bids.map((bid) => (
-                            <div
-                                className="bid-card"
-                                key={bid._id}
+                    </div>
+
+                    <div className="auction-details-info">
+
+                        <span className="auction-eyebrow">
+                            LIVE AUCTION
+                        </span>
+
+                        <h1>
+                            {product.name ||
+                                "Auction Product"}
+                        </h1>
+
+                        <p className="auction-seller">
+                            Seller:{" "}
+                            <strong>
+                                {auction.seller?.name ||
+                                    "Seller"}
+                            </strong>
+                        </p>
+
+                        <div className="auction-status-row">
+
+                            <span
+                                className={`auction-status ${
+                                    isActive
+                                        ? "auction-status-live"
+                                        : isUpcoming
+                                        ? "auction-status-upcoming"
+                                        : isEnded
+                                        ? "auction-status-ended"
+                                        : "auction-status-cancelled"
+                                }`}
                             >
+                                {isActive
+                                    ? "🔴 Live"
+                                    : isUpcoming
+                                    ? "⏳ Upcoming"
+                                    : isEnded
+                                    ? "✓ Ended"
+                                    : "✕ Cancelled"}
+                            </span>
+
+                        </div>
+
+                        <div className="auction-detail-price">
+
+                            <div>
+                                <span>
+                                    Starting Price
+                                </span>
+
                                 <strong>
-                                    ₹{bid.amount}
+                                    ₹
+                                    {Number(
+                                        auction.startingPrice ||
+                                        0
+                                    ).toLocaleString(
+                                        "en-IN"
+                                    )}
                                 </strong>
+                            </div>
 
-                                <p>
-                                    Bidder:{" "}
-                                    {bid.buyer?.name ||
-                                        "Buyer"}
-                                </p>
+                            <div>
+                                <span>
+                                    Current Bid
+                                </span>
 
-                                <small>
-                                    {bid.createdAt
+                                <strong>
+                                    ₹
+                                    {Number(
+                                        auction.currentPrice ||
+                                        0
+                                    ).toLocaleString(
+                                        "en-IN"
+                                    )}
+                                </strong>
+                            </div>
+
+                        </div>
+
+                        <div className="auction-time-info">
+
+                            <div>
+                                <span>
+                                    🕐 Starts
+                                </span>
+
+                                <strong>
+                                    {auction.startTime
                                         ? new Date(
-                                              bid.createdAt
+                                              auction.startTime
                                           ).toLocaleString(
                                               "en-IN"
                                           )
-                                        : ""}
-                                </small>
+                                        : "Not available"}
+                                </strong>
                             </div>
-                        ))
+
+                            <div>
+                                <span>
+                                    ⏰ Ends
+                                </span>
+
+                                <strong>
+                                    {auction.endTime
+                                        ? new Date(
+                                              auction.endTime
+                                          ).toLocaleString(
+                                              "en-IN"
+                                          )
+                                        : "Not available"}
+                                </strong>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {isActive && (
+
+                    <div className="bid-form">
+
+                        <div>
+                            <span className="auction-eyebrow">
+                                PLACE YOUR BID
+                            </span>
+
+                            <h2>
+                                Make Your Offer
+                            </h2>
+
+                            <p>
+                                Enter an amount
+                                higher than the
+                                current bid.
+                            </p>
+                        </div>
+
+                        <form
+                            onSubmit={handleBid}
+                        >
+
+                            <div className="auction-money-input">
+
+                                <span>
+                                    ₹
+                                </span>
+
+                                <input
+                                    type="number"
+                                    min={
+                                        Number(
+                                            auction.currentPrice
+                                        ) + 1
+                                    }
+                                    step="1"
+                                    value={amount}
+                                    onChange={(event) =>
+                                        setAmount(
+                                            event.target.value
+                                        )
+                                    }
+                                    placeholder={`More than ₹${Number(
+                                        auction.currentPrice
+                                    ).toLocaleString(
+                                        "en-IN"
+                                    )}`}
+                                    required
+                                />
+
+                            </div>
+
+                            <button
+                                type="submit"
+                                className="auction-primary-button"
+                                disabled={
+                                    bidLoading
+                                }
+                            >
+                                {bidLoading
+                                    ? "Placing Bid..."
+                                    : "🔨 Place Bid"}
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                )}
+
+                {isUpcoming && (
+
+                    <div className="auction-form-info">
+
+                        <span>
+                            ⏳
+                        </span>
+
+                        <div>
+                            <strong>
+                                Auction has not started
+                            </strong>
+
+                            <p>
+                                Bidding will be
+                                available once
+                                the auction starts.
+                            </p>
+                        </div>
+
+                    </div>
+
+                )}
+
+                {isEnded && (
+
+                    <div className="auction-form-info">
+
+                        <span>
+                            🏁
+                        </span>
+
+                        <div>
+                            <strong>
+                                Auction has ended
+                            </strong>
+
+                            <p>
+                                No more bids can
+                                be placed for this
+                                auction.
+                            </p>
+                        </div>
+
+                    </div>
+
+                )}
+
+                <section className="bid-history">
+
+                    <div className="auctions-section-title">
+
+                        <div>
+                            <span className="auction-eyebrow">
+                                AUCTION ACTIVITY
+                            </span>
+
+                            <h2>
+                                Bid History
+                            </h2>
+                        </div>
+
+                        <span>
+                            {bids.length}{" "}
+                            {bids.length === 1
+                                ? "Bid"
+                                : "Bids"}
+                        </span>
+
+                    </div>
+
+                    {bids.length === 0 ? (
+
+                        <div className="auction-empty">
+
+                            <div className="auction-empty-icon">
+                                💰
+                            </div>
+
+                            <h3>
+                                No Bids Yet
+                            </h3>
+
+                            <p>
+                                Be the first buyer
+                                to place a bid.
+                            </p>
+
+                        </div>
+
+                    ) : (
+
+                        <div>
+
+                            {bids.map((bid, index) => (
+
+                                <div
+                                    className="bid-card"
+                                    key={bid._id}
+                                >
+
+                                    <div>
+
+                                        <span>
+                                            #{index + 1}
+                                        </span>
+
+                                        <strong>
+                                            {bid.buyer?.name ||
+                                                "Buyer"}
+                                        </strong>
+
+                                    </div>
+
+                                    <div>
+
+                                        <strong>
+                                            ₹
+                                            {Number(
+                                                bid.amount ||
+                                                0
+                                            ).toLocaleString(
+                                                "en-IN"
+                                            )}
+                                        </strong>
+
+                                        <small>
+                                            {bid.createdAt
+                                                ? new Date(
+                                                      bid.createdAt
+                                                  ).toLocaleString(
+                                                      "en-IN"
+                                                  )
+                                                : ""}
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            ))}
+
+                        </div>
                     )}
 
-                    <br />
+                </section>
 
-                    <Link to="/auctions">
-                        Back to Auctions
-                    </Link>
-                </div>
-            </main>
+            </div>
 
-            <Footer />
-        </>
+        </main>
     );
 };
 
