@@ -24,7 +24,8 @@ const Login = () => {
     const handleChange = (e) => {
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value
+            [e.target.name]:
+                e.target.value
         });
     };
 
@@ -35,19 +36,33 @@ const Login = () => {
         setLoading(true);
 
         try {
-            const data = await login(formData);
+            const data =
+                await login(formData);
 
-            const role = data.user?.role;
+            const role =
+                data.user?.role;
 
-            if (location.state?.from?.pathname) {
-                navigate(location.state.from.pathname);
-            } else if (role === "admin") {
+            const destination =
+                location.state?.from;
+
+            if (destination?.pathname) {
+                navigate(
+                    destination.pathname +
+                        (destination.search || "") +
+                        (destination.hash || "")
+                );
+
+                return;
+            }
+
+            if (role === "admin") {
                 navigate("/admin");
             } else if (role === "seller") {
                 navigate("/seller");
             } else {
                 navigate("/buyer");
             }
+
         } catch (error) {
             setError(
                 error.response?.data?.message ||
@@ -60,8 +75,12 @@ const Login = () => {
 
     return (
         <div className="auth-page">
+
             <div className="auth-card">
-                <h1>Welcome Back</h1>
+
+                <h1>
+                    Welcome Back
+                </h1>
 
                 <p>
                     Login to your ReSellBazar account
@@ -73,7 +92,10 @@ const Login = () => {
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit}>
+                <form
+                    onSubmit={handleSubmit}
+                >
+
                     <label htmlFor="email">
                         Email
                     </label>
@@ -82,8 +104,12 @@ const Login = () => {
                         id="email"
                         type="email"
                         name="email"
-                        value={formData.email}
-                        onChange={handleChange}
+                        value={
+                            formData.email
+                        }
+                        onChange={
+                            handleChange
+                        }
                         placeholder="Enter your email"
                         required
                     />
@@ -96,8 +122,12 @@ const Login = () => {
                         id="password"
                         type="password"
                         name="password"
-                        value={formData.password}
-                        onChange={handleChange}
+                        value={
+                            formData.password
+                        }
+                        onChange={
+                            handleChange
+                        }
                         placeholder="Enter your password"
                         required
                     />
@@ -110,15 +140,27 @@ const Login = () => {
                             ? "Logging in..."
                             : "Login"}
                     </button>
+
                 </form>
 
                 <p className="auth-link">
+
                     Don't have an account?{" "}
-                    <Link to="/register">
+
+                    <Link
+                        to="/register"
+                        state={{
+                            from:
+                                location.state?.from
+                        }}
+                    >
                         Register
                     </Link>
+
                 </p>
+
             </div>
+
         </div>
     );
 };

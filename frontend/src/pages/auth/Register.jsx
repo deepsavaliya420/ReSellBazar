@@ -1,27 +1,41 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import {
+    Link,
+    useLocation,
+    useNavigate
+} from "react-router-dom";
+
 import { useAuth } from "../../context/AuthContext";
 
 const Register = () => {
     const { register } = useAuth();
+
     const navigate = useNavigate();
+    const location = useLocation();
 
-    const [formData, setFormData] = useState({
-        name: "",
-        email: "",
-        mobile: "",
-        password: "",
-        role: "buyer"
-    });
+    const [formData, setFormData] =
+        useState({
+            name: "",
+            email: "",
+            mobile: "",
+            password: "",
+            role: "buyer"
+        });
 
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [success, setSuccess] = useState("");
+    const [error, setError] =
+        useState("");
+
+    const [loading, setLoading] =
+        useState(false);
+
+    const [success, setSuccess] =
+        useState("");
 
     const handleChange = (e) => {
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value
+            [e.target.name]:
+                e.target.value
         });
     };
 
@@ -39,9 +53,17 @@ const Register = () => {
                 "Registration successful. Please login."
             );
 
+            const destination =
+                location.state?.from;
+
             setTimeout(() => {
-                navigate("/login");
+                navigate("/login", {
+                    state: {
+                        from: destination
+                    }
+                });
             }, 1000);
+
         } catch (error) {
             setError(
                 error.response?.data?.message ||
@@ -54,8 +76,12 @@ const Register = () => {
 
     return (
         <div className="auth-page">
+
             <div className="auth-card">
-                <h1>Create Account</h1>
+
+                <h1>
+                    Create Account
+                </h1>
 
                 <p>
                     Join ReSellBazar today.
@@ -73,56 +99,90 @@ const Register = () => {
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit}>
-                    <label>Name</label>
+                <form
+                    onSubmit={handleSubmit}
+                >
+
+                    <label>
+                        Name
+                    </label>
 
                     <input
                         name="name"
-                        value={formData.name}
-                        onChange={handleChange}
+                        value={
+                            formData.name
+                        }
+                        onChange={
+                            handleChange
+                        }
                         placeholder="Enter your name"
                         required
                     />
 
-                    <label>Email</label>
+                    <label>
+                        Email
+                    </label>
 
                     <input
                         type="email"
                         name="email"
-                        value={formData.email}
-                        onChange={handleChange}
+                        value={
+                            formData.email
+                        }
+                        onChange={
+                            handleChange
+                        }
                         placeholder="Enter your email"
                         required
                     />
 
-                    <label>Mobile</label>
+                    <label>
+                        Mobile
+                    </label>
 
                     <input
                         name="mobile"
-                        value={formData.mobile}
-                        onChange={handleChange}
+                        value={
+                            formData.mobile
+                        }
+                        onChange={
+                            handleChange
+                        }
                         placeholder="Enter mobile number"
                         required
                     />
 
-                    <label>Password</label>
+                    <label>
+                        Password
+                    </label>
 
                     <input
                         type="password"
                         name="password"
-                        value={formData.password}
-                        onChange={handleChange}
+                        value={
+                            formData.password
+                        }
+                        onChange={
+                            handleChange
+                        }
                         placeholder="Create password"
                         required
                     />
 
-                    <label>Account Type</label>
+                    <label>
+                        Account Type
+                    </label>
 
                     <select
                         name="role"
-                        value={formData.role}
-                        onChange={handleChange}
+                        value={
+                            formData.role
+                        }
+                        onChange={
+                            handleChange
+                        }
                     >
+
                         <option value="buyer">
                             Buyer
                         </option>
@@ -130,6 +190,7 @@ const Register = () => {
                         <option value="seller">
                             Seller
                         </option>
+
                     </select>
 
                     <button
@@ -140,15 +201,27 @@ const Register = () => {
                             ? "Creating Account..."
                             : "Register"}
                     </button>
+
                 </form>
 
                 <p className="auth-link">
+
                     Already have an account?{" "}
-                    <Link to="/login">
+
+                    <Link
+                        to="/login"
+                        state={{
+                            from:
+                                location.state?.from
+                        }}
+                    >
                         Login
                     </Link>
+
                 </p>
+
             </div>
+
         </div>
     );
 };

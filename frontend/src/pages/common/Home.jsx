@@ -9,8 +9,11 @@ import ErrorMessage from "../../components/ErrorMessage";
 import { getProducts } from "../../services/productApi";
 import { getCategories } from "../../services/categoryApi";
 
+import { useAuth } from "../../context/AuthContext";
+
 const Home = () => {
     const navigate = useNavigate();
+    const { user } = useAuth();
 
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -23,11 +26,13 @@ const Home = () => {
                 setLoading(true);
                 setError("");
 
-                const [productsData, categoriesData] =
-                    await Promise.all([
-                        getProducts(),
-                        getCategories()
-                    ]);
+                const [
+                    productsData,
+                    categoriesData
+                ] = await Promise.all([
+                    getProducts(),
+                    getCategories()
+                ]);
 
                 setProducts(
                     productsData.products ||
@@ -51,14 +56,17 @@ const Home = () => {
 
                 const filteredCategories =
                     Array.isArray(categoryList)
-                        ? categoryList.filter((category) =>
-                              mainCategories.includes(
-                                  category.name
-                              )
+                        ? categoryList.filter(
+                              (category) =>
+                                  mainCategories.includes(
+                                      category.name
+                                  )
                           )
                         : [];
 
-                setCategories(filteredCategories);
+                setCategories(
+                    filteredCategories
+                );
             } catch (error) {
                 setError(
                     error.response?.data?.message ||
@@ -72,10 +80,37 @@ const Home = () => {
         loadHomeData();
     }, []);
 
+    const handleSellProduct = () => {
+        if (!user) {
+            navigate("/register", {
+                state: {
+                    from: {
+                        pathname:
+                            "/seller/products/add"
+                    }
+                }
+            });
+
+            return;
+        }
+
+        if (user.role === "seller") {
+            navigate("/seller/products/add");
+            return;
+        }
+
+        if (user.role === "buyer") {
+            alert(
+                "Your current account is a buyer account. Please contact an admin to change your account to seller."
+            );
+        }
+    };
+
     return (
         <>
             <section className="hero">
                 <div className="hero-content">
+
                     <h1>
                         Buy. Sell. Auction.
                     </h1>
@@ -86,6 +121,7 @@ const Home = () => {
                     </p>
 
                     <div className="hero-buttons">
+
                         <button
                             className="primary-btn"
                             onClick={() =>
@@ -97,73 +133,107 @@ const Home = () => {
 
                         <button
                             className="secondary-btn"
-                            onClick={() =>
-                                navigate("/register")
+                            onClick={
+                                handleSellProduct
                             }
                         >
                             Sell Your Product
                         </button>
+
                     </div>
+
                 </div>
             </section>
 
             <section className="section">
+
                 <div className="section-header">
-                    <h2>Browse Categories</h2>
+
+                    <h2>
+                        Browse Categories
+                    </h2>
 
                     <Link to="/categories">
                         View All
                     </Link>
+
                 </div>
 
                 {loading ? (
                     <Loading />
                 ) : (
                     <div className="categories">
-                        {categories.map((category) => (
-                            <CategoryCard
-                                key={
-                                    category._id ||
-                                    category.name
-                                }
-                                category={category}
-                            />
-                        ))}
+
+                        {categories.map(
+                            (category) => (
+                                <CategoryCard
+                                    key={
+                                        category._id ||
+                                        category.name
+                                    }
+                                    category={
+                                        category
+                                    }
+                                />
+                            )
+                        )}
+
                     </div>
                 )}
+
             </section>
 
             <section className="section products-section">
+
                 <div className="section-header">
-                    <h2>Featured Products</h2>
+
+                    <h2>
+                        Featured Products
+                    </h2>
 
                     <Link to="/products">
                         View All
                     </Link>
+
                 </div>
 
-                <ErrorMessage message={error} />
+                <ErrorMessage
+                    message={error}
+                />
 
                 {loading ? (
                     <Loading />
                 ) : products.length === 0 ? (
-                    <p>No products available.</p>
+                    <p>
+                        No products available.
+                    </p>
                 ) : (
                     <div className="products">
+
                         {products
                             .slice(0, 8)
-                            .map((product) => (
-                                <ProductCard
-                                    key={product._id}
-                                    product={product}
-                                />
-                            ))}
+                            .map(
+                                (product) => (
+                                    <ProductCard
+                                        key={
+                                            product._id
+                                        }
+                                        product={
+                                            product
+                                        }
+                                    />
+                                )
+                            )}
+
                     </div>
                 )}
+
             </section>
 
             <section className="auction-section">
+
                 <div>
+
                     <h2>
                         Discover Amazing Auctions
                     </h2>
@@ -176,16 +246,20 @@ const Home = () => {
                     <button
                         className="primary-btn"
                         onClick={() =>
-                            navigate("/buyer/auctions")
+                            navigate(
+                                "/buyer/auctions"
+                            )
                         }
                     >
                         Explore Auctions
                     </button>
+
                 </div>
 
                 <div className="auction-icon">
                     🔨
                 </div>
+
             </section>
         </>
     );
