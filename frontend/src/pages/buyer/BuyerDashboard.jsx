@@ -46,6 +46,13 @@ const BuyerDashboard = () => {
             description: "Complete your purchase and place your order.",
             link: "/buyer/checkout",
             className: "dashboard-card-checkout"
+        },
+        {
+            icon: "🎧",
+            title: "Support",
+            description: "Contact customer support and manage your support tickets.",
+            link: "/support",
+            className: "dashboard-card-support"
         }
     ];
 
@@ -53,7 +60,9 @@ const BuyerDashboard = () => {
         <div className="buyer-dashboard">
 
             <div className="buyer-dashboard-header">
+
                 <div>
+
                     <span className="dashboard-welcome-label">
                         BUYER DASHBOARD
                     </span>
@@ -72,9 +81,11 @@ const BuyerDashboard = () => {
                         discover products and track your
                         purchases from one place.
                     </p>
+
                 </div>
 
                 <div className="dashboard-profile-icon">
+
                     {(
                         user?.name ||
                         user?.fullName ||
@@ -82,27 +93,42 @@ const BuyerDashboard = () => {
                     )
                         .charAt(0)
                         .toUpperCase()}
+
                 </div>
+
             </div>
 
+
             <div className="dashboard-quick-title">
+
                 <div>
-                    <h2>Quick Access</h2>
+
+                    <h2>
+                        Quick Access
+                    </h2>
+
                     <p>
                         Everything you need, right at your
                         fingertips.
                     </p>
+
                 </div>
+
             </div>
 
+
             <div className="dashboard-grid">
+
                 {dashboardCards.map((card) => (
+
                     <Link
                         key={card.title}
                         to={card.link}
                         className={`dashboard-card ${card.className}`}
                     >
+
                         <div className="dashboard-card-top">
+
                             <div className="dashboard-card-icon">
                                 {card.icon}
                             </div>
@@ -110,26 +136,41 @@ const BuyerDashboard = () => {
                             <span className="dashboard-card-arrow">
                                 →
                             </span>
+
                         </div>
 
+
                         <div className="dashboard-card-content">
-                            <h2>{card.title}</h2>
+
+                            <h2>
+                                {card.title}
+                            </h2>
 
                             <p>
                                 {card.description}
                             </p>
+
                         </div>
+
 
                         <span className="dashboard-card-link">
                             Explore
                         </span>
+
                     </Link>
+
                 ))}
+
             </div>
 
+
             <div className="buyer-dashboard-banner">
+
                 <div>
-                    <span>RESELLBAZAR</span>
+
+                    <span>
+                        RESELLBAZAR
+                    </span>
 
                     <h2>
                         Find it. Buy it. Enjoy it.
@@ -146,11 +187,14 @@ const BuyerDashboard = () => {
                     >
                         Start Shopping →
                     </Link>
+
                 </div>
+
 
                 <div className="dashboard-banner-icon">
                     🛒
                 </div>
+
             </div>
 
         </div>

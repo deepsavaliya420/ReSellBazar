@@ -17,6 +17,7 @@ import Home from "./pages/common/Home";
 import Products from "./pages/common/Products";
 import ProductDetails from "./pages/common/ProductDetails";
 import Categories from "./pages/common/Categories";
+import Support from "./pages/common/Support";
 import NotFound from "./pages/common/NotFound";
 
 import Login from "./pages/auth/Login";
@@ -53,9 +54,12 @@ import ManageReturns from "./pages/admin/ManageReturns";
 import ManageAuctions from "./pages/admin/ManageAuctions";
 import SupportTickets from "./pages/admin/SupportTickets";
 
+
 const App = () => {
+
     return (
         <BrowserRouter>
+
             <Routes>
 
                 <Route element={<MainLayout />}>
@@ -90,6 +94,20 @@ const App = () => {
                         element={<Register />}
                     />
 
+                    {/* Common authenticated support page */}
+
+                    <Route
+                        path="/support"
+                        element={
+                            <ProtectedRoute>
+                                <Support />
+                            </ProtectedRoute>
+                        }
+                    />
+
+
+                    {/* BUYER ROUTES */}
+
                     <Route
                         element={
                             <ProtectedRoute>
@@ -99,6 +117,7 @@ const App = () => {
                             </ProtectedRoute>
                         }
                     >
+
                         <Route
                             path="/buyer"
                             element={<BuyerDashboard />}
@@ -158,7 +177,11 @@ const App = () => {
                             path="/buyer/reviews/:productId"
                             element={<Reviews />}
                         />
+
                     </Route>
+
+
+                    {/* SELLER ROUTES */}
 
                     <Route
                         element={
@@ -169,6 +192,7 @@ const App = () => {
                             </ProtectedRoute>
                         }
                     >
+
                         <Route
                             path="/seller"
                             element={<SellerDashboard />}
@@ -208,7 +232,11 @@ const App = () => {
                             path="/seller/messages"
                             element={<SellerMessages />}
                         />
+
                     </Route>
+
+
+                    {/* ADMIN ROUTES */}
 
                     <Route
                         element={
@@ -219,6 +247,7 @@ const App = () => {
                             </ProtectedRoute>
                         }
                     >
+
                         <Route
                             path="/admin"
                             element={<AdminDashboard />}
@@ -258,7 +287,11 @@ const App = () => {
                             path="/admin/support"
                             element={<SupportTickets />}
                         />
+
                     </Route>
+
+
+                    {/* 404 */}
 
                     <Route
                         path="/404"
@@ -278,8 +311,10 @@ const App = () => {
                 </Route>
 
             </Routes>
+
         </BrowserRouter>
     );
 };
+
 
 export default App;

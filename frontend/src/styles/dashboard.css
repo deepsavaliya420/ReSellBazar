@@ -2847,3 +2847,426 @@
         font-size: 13px;
     }
 }
+/* ========================================
+   BUYER ORDER DELIVERY TRACKING
+======================================== */
+
+.order-tracking {
+    position: relative;
+    margin-top: 25px;
+    padding: 22px;
+    border: 1px solid #e0e7ff;
+    border-radius: 16px;
+    background: linear-gradient(
+        135deg,
+        #f8faff,
+        #ffffff
+    );
+}
+
+.tracking-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 24px;
+}
+
+.tracking-title span {
+    color: #374151;
+    font-size: 14px;
+    font-weight: 850;
+}
+
+.tracking-title strong {
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: #eef2ff;
+    color: #4f46e5;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.tracking-progress {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+}
+
+.tracking-line {
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    top: 18px;
+    height: 4px;
+    border-radius: 10px;
+    background: #e5e7eb;
+    z-index: 0;
+}
+
+.tracking-line-active {
+    background: linear-gradient(
+        90deg,
+        #6366f1,
+        #818cf8
+    );
+}
+
+.tracking-step {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 20%;
+    color: #94a3b8;
+    text-align: center;
+}
+
+.tracking-step span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border: 3px solid #e5e7eb;
+    border-radius: 50%;
+    background: #ffffff;
+    font-size: 15px;
+    transition: all 0.25s ease;
+}
+
+.tracking-step small {
+    max-width: 100px;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 750;
+    line-height: 1.3;
+}
+
+.tracking-step-active {
+    color: #4f46e5;
+}
+
+.tracking-step-active span {
+    border-color: #6366f1;
+    background: linear-gradient(
+        135deg,
+        #6366f1,
+        #4f46e5
+    );
+    color: #ffffff;
+    box-shadow:
+        0 7px 18px rgba(
+            79,
+            70,
+            229,
+            0.25
+        );
+}
+
+.tracking-step-active small {
+    color: #4f46e5;
+}
+
+
+/* ========================================
+   DELIVERY INFORMATION
+======================================== */
+
+.delivery-info {
+    margin-top: 22px;
+    padding: 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 15px;
+    background: #ffffff;
+}
+
+.delivery-info-header {
+    margin-bottom: 17px;
+}
+
+.delivery-info-header span {
+    color: #475569;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.delivery-info-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0, 1fr)
+        );
+    gap: 15px;
+}
+
+.delivery-info-item {
+    min-width: 0;
+    padding: 14px;
+    border-radius: 11px;
+    background: #f8fafc;
+}
+
+.delivery-info-item span {
+    display: block;
+    margin-bottom: 6px;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.delivery-info-item strong {
+    display: block;
+    overflow-wrap: anywhere;
+    color: #111827;
+    font-size: 13px;
+    font-weight: 850;
+    line-height: 1.45;
+}
+
+
+/* ========================================
+   DELIVERY NOTES
+======================================== */
+
+.delivery-notes {
+    margin-top: 15px;
+    padding: 13px 15px;
+    border-left: 4px solid #6366f1;
+    border-radius: 8px;
+    background: #f8faff;
+}
+
+.delivery-notes span {
+    display: block;
+    margin-bottom: 5px;
+    color: #4f46e5;
+    font-size: 11px;
+    font-weight: 850;
+    text-transform: uppercase;
+}
+
+.delivery-notes p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+
+/* ========================================
+   ORDER STATUS
+======================================== */
+
+.order-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 11px;
+    border-radius: 8px;
+    font-size: 11px !important;
+    font-weight: 850 !important;
+    text-transform: capitalize;
+}
+
+.order-status-pending {
+    background: #fff7ed !important;
+    color: #c2410c !important;
+}
+
+.order-status-shipping {
+    background: #eff6ff !important;
+    color: #2563eb !important;
+}
+
+.order-status-delivered {
+    background: #ecfdf5 !important;
+    color: #047857 !important;
+}
+
+.order-status-cancelled {
+    background: #fef2f2 !important;
+    color: #dc2626 !important;
+}
+
+
+/* ========================================
+   CANCELLED ORDER
+======================================== */
+
+.order-cancelled-box {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 22px;
+    padding: 17px;
+    border: 1px solid #fecaca;
+    border-radius: 13px;
+    background: #fef2f2;
+}
+
+.order-cancelled-box > span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #fee2e2;
+    color: #dc2626;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.order-cancelled-box strong {
+    display: block;
+    margin-bottom: 3px;
+    color: #991b1b;
+    font-size: 14px;
+    font-weight: 850;
+}
+
+.order-cancelled-box p {
+    margin: 0;
+    color: #b91c1c;
+    font-size: 12px;
+}
+
+
+/* ========================================
+   DELIVERY RESPONSIVE
+======================================== */
+
+@media (max-width: 800px) {
+
+    .delivery-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tracking-step small {
+        font-size: 10px;
+    }
+
+    .tracking-step span {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+
+    .tracking-line {
+        left: 10%;
+        right: 10%;
+        top: 17px;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .order-tracking {
+        padding: 17px;
+    }
+
+    .tracking-title {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 9px;
+    }
+
+    .tracking-progress {
+        gap: 2px;
+    }
+
+    .tracking-step {
+        width: 20%;
+    }
+
+    .tracking-step span {
+        width: 31px;
+        height: 31px;
+        border-width: 2px;
+        font-size: 12px;
+    }
+
+    .tracking-step small {
+        max-width: 65px;
+        font-size: 9px;
+    }
+
+    .tracking-line {
+        left: 10%;
+        right: 10%;
+        top: 15px;
+        height: 3px;
+    }
+
+    .delivery-info {
+        padding: 16px;
+    }
+
+    .delivery-info-grid {
+        gap: 10px;
+    }
+
+    .delivery-info-item {
+        padding: 12px;
+    }
+}
+
+
+@media (max-width: 450px) {
+
+    .order-tracking {
+        padding: 14px;
+        border-radius: 13px;
+    }
+
+    .tracking-title span {
+        font-size: 13px;
+    }
+
+    .tracking-title strong {
+        font-size: 10px;
+    }
+
+    .tracking-step span {
+        width: 27px;
+        height: 27px;
+        font-size: 10px;
+    }
+
+    .tracking-step small {
+        max-width: 55px;
+        font-size: 8px;
+    }
+
+    .tracking-line {
+        top: 13px;
+    }
+
+    .delivery-info {
+        padding: 13px;
+    }
+
+    .delivery-info-item strong {
+        font-size: 12px;
+    }
+
+    .delivery-notes p {
+        font-size: 12px;
+    }
+
+    .order-cancelled-box {
+        padding: 13px;
+    }
+}

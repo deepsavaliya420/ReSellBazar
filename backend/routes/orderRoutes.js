@@ -1,15 +1,21 @@
 const express = require("express");
+
 const router = express.Router();
 
 const {
     createOrder,
     getMyOrders,
     getAllOrders,
-    updateOrderStatus
+    updateOrderStatus,
+    updateDelivery
 } = require("../controllers/orderController");
 
-const authMiddleware = require("../middleware/authMiddleware");
-const authorizeRoles = require("../middleware/roleMiddleware");
+const authMiddleware =
+    require("../middleware/authMiddleware");
+
+const authorizeRoles =
+    require("../middleware/roleMiddleware");
+
 
 router.post(
     "/",
@@ -18,12 +24,14 @@ router.post(
     createOrder
 );
 
+
 router.get(
     "/my",
     authMiddleware,
     authorizeRoles("buyer"),
     getMyOrders
 );
+
 
 router.get(
     "/all",
@@ -32,11 +40,21 @@ router.get(
     getAllOrders
 );
 
+
 router.put(
     "/:id/status",
     authMiddleware,
     authorizeRoles("admin", "seller"),
     updateOrderStatus
 );
+
+
+router.put(
+    "/:id/delivery",
+    authMiddleware,
+    authorizeRoles("admin"),
+    updateDelivery
+);
+
 
 module.exports = router;

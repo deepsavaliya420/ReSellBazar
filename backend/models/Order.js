@@ -1,41 +1,51 @@
 const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema({
+
     buyer: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true
     },
+
     items: [{
         product: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Product"
         },
+
         seller: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User"
         },
+
         quantity: Number,
+
         price: Number
     }],
+
     address: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Address"
     },
+
     totalAmount: {
         type: Number,
         required: true
     },
+
     paymentMethod: {
         type: String,
         enum: ["cod", "online"],
         default: "cod"
     },
+
     paymentStatus: {
         type: String,
         enum: ["pending", "paid", "failed"],
         default: "pending"
     },
+
     orderStatus: {
         type: String,
         enum: [
@@ -47,7 +57,46 @@ const orderSchema = new mongoose.Schema({
             "cancelled"
         ],
         default: "placed"
+    },
+
+    delivery: {
+
+        courier: {
+            type: String,
+            default: ""
+        },
+
+        trackingNumber: {
+            type: String,
+            default: ""
+        },
+
+        estimatedDelivery: {
+            type: Date,
+            default: null
+        },
+
+        shippedAt: {
+            type: Date,
+            default: null
+        },
+
+        outForDeliveryAt: {
+            type: Date,
+            default: null
+        },
+
+        deliveredAt: {
+            type: Date,
+            default: null
+        },
+
+        deliveryNotes: {
+            type: String,
+            default: ""
+        }
     }
+
 }, {
     timestamps: true
 });

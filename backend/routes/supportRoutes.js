@@ -1,15 +1,21 @@
 const express = require("express");
+
 const router = express.Router();
 
 const {
     createTicket,
     getMyTickets,
     getAllTickets,
-    updateTicket
+    getTicketById,
+    updateTicket,
+    addTicketMessage
 } = require("../controllers/supportController");
 
 const authMiddleware = require("../middleware/authMiddleware");
-const authorizeRoles = require("../middleware/roleMiddleware");
+
+const authorizeRoles =
+    require("../middleware/roleMiddleware");
+
 
 router.post(
     "/",
@@ -17,11 +23,13 @@ router.post(
     createTicket
 );
 
+
 router.get(
     "/my",
     authMiddleware,
     getMyTickets
 );
+
 
 router.get(
     "/all",
@@ -30,11 +38,27 @@ router.get(
     getAllTickets
 );
 
+
+router.get(
+    "/:id",
+    authMiddleware,
+    getTicketById
+);
+
+
 router.put(
     "/:id",
     authMiddleware,
     authorizeRoles("admin"),
     updateTicket
 );
+
+
+router.post(
+    "/:id/messages",
+    authMiddleware,
+    addTicketMessage
+);
+
 
 module.exports = router;

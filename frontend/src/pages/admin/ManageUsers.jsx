@@ -1,41 +1,65 @@
 import { useEffect, useState } from "react";
-import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
+
 import Loading from "../../components/Loading";
 import ErrorMessage from "../../components/ErrorMessage";
+
 import {
     getUsers,
     updateUserRole
 } from "../../services/adminApi";
 
+
 const ManageUsers = () => {
+
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
+
     const loadUsers = async () => {
+
         try {
+
+            setError("");
+
             const data = await getUsers();
 
             setUsers(
-                Array.isArray(data) ? data : []
+                Array.isArray(data)
+                    ? data
+                    : []
             );
+
         } catch (error) {
+
             setError(
                 error.response?.data?.message ||
                 "Failed to load users."
             );
+
         } finally {
+
             setLoading(false);
+
         }
+
     };
+
 
     useEffect(() => {
         loadUsers();
     }, []);
 
-    const handleRole = async (id, role) => {
+
+    const handleRole = async (
+        id,
+        role
+    ) => {
+
         try {
+
+            setError("");
+
             const data =
                 await updateUserRole(
                     id,
@@ -52,91 +76,189 @@ const ManageUsers = () => {
                         : user
                 )
             );
+
         } catch (error) {
+
             setError(
                 error.response?.data?.message ||
                 "Failed to update role."
             );
+
         }
+
     };
 
+
     if (loading) {
+
         return (
-            <>
-                <Navbar />
+            <div className="page-container">
                 <Loading />
-                <Footer />
-            </>
+            </div>
         );
+
     }
 
-    return (
-        <>
-            <Navbar />
 
-            <div className="page-container">
-                <div className="page-header">
-                    <h1>Manage Users</h1>
+    return (
+
+        <div className="page-container">
+
+            <div className="page-header">
+
+                <div>
+                    <span className="dashboard-welcome-label">
+                        ADMINISTRATION
+                    </span>
+
+                    <h1>
+                        Manage Users
+                    </h1>
+
+                    <p>
+                        View users and manage their
+                        marketplace roles.
+                    </p>
                 </div>
 
-                <ErrorMessage message={error} />
+            </div>
 
-                <div className="orders-list">
-                    {users.map((user) => (
+
+            <ErrorMessage
+                message={error}
+            />
+
+
+            <div className="orders-list">
+
+                {users.length === 0 ? (
+
+                    <div className="order-card">
+
+                        <h3>
+                            No users found
+                        </h3>
+
+                        <p>
+                            There are currently no
+                            registered users.
+                        </p>
+
+                    </div>
+
+                ) : (
+
+                    users.map((user) => (
+
                         <div
                             className="order-card"
                             key={user._id}
                         >
-                            <h3>{user.name}</h3>
 
-                            <p>
-                                Email: {user.email}
-                            </p>
+                            <div className="order-card-header">
 
-                            <p>
-                                Mobile: {user.mobile}
-                            </p>
+                                <div>
 
-                            <p>
-                                Status: {user.status}
-                            </p>
+                                    <h3>
+                                        {user.name}
+                                    </h3>
 
-                            <p>
-                                Current Role:{" "}
-                                <strong>
-                                    {user.role}
-                                </strong>
-                            </p>
+                                    <p>
+                                        {user.email}
+                                    </p>
 
-                            <select
-                                value={user.role}
-                                onChange={(e) =>
-                                    handleRole(
-                                        user._id,
-                                        e.target.value
-                                    )
-                                }
-                            >
-                                <option value="buyer">
-                                    Buyer
-                                </option>
+                                </div>
 
-                                <option value="seller">
-                                    Seller
-                                </option>
+                                <span
+                                    className={
+                                        user.status === "active"
+                                            ? "status-badge status-delivered"
+                                            : "status-badge status-cancelled"
+                                    }
+                                >
+                                    {user.status}
+                                </span>
 
-                                <option value="admin">
-                                    Admin
-                                </option>
-                            </select>
+                            </div>
+
+
+                            <div className="order-info-grid">
+
+                                <div>
+
+                                    <strong>
+                                        Mobile
+                                    </strong>
+
+                                    <p>
+                                        {user.mobile}
+                                    </p>
+
+                                </div>
+
+
+                                <div>
+
+                                    <strong>
+                                        Current Role
+                                    </strong>
+
+                                    <p>
+                                        {user.role}
+                                    </p>
+
+                                </div>
+
+
+                                <div>
+
+                                    <strong>
+                                        Change Role
+                                    </strong>
+
+                                    <select
+                                        value={
+                                            user.role
+                                        }
+                                        onChange={(e) =>
+                                            handleRole(
+                                                user._id,
+                                                e.target.value
+                                            )
+                                        }
+                                    >
+
+                                        <option value="buyer">
+                                            Buyer
+                                        </option>
+
+                                        <option value="seller">
+                                            Seller
+                                        </option>
+
+                                        <option value="admin">
+                                            Admin
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
                         </div>
-                    ))}
-                </div>
+
+                    ))
+
+                )}
+
             </div>
 
-            <Footer />
-        </>
+        </div>
+
     );
+
 };
+
 
 export default ManageUsers;
