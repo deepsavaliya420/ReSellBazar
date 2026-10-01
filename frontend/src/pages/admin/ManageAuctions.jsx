@@ -6,29 +6,43 @@ import ErrorMessage from "../../components/ErrorMessage";
 
 import {
     getAuctions,
+    approveAuction,
+    rejectAuction,
     endAuction
 } from "../../services/auctionApi";
 
-
 const statuses = [
+    "pending",
     "active",
     "upcoming",
     "ended",
-    "cancelled"
+    "cancelled",
+    "rejected"
 ];
-
 
 const ManageAuction = () => {
 
-    const [auctions, setAuctions] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
-    const [error, setError] = useState("");
-    const [message, setMessage] = useState("");
-    const [filter, setFilter] = useState("all");
+    const [auctions, setAuctions] =
+        useState([]);
 
+    const [loading, setLoading] =
+        useState(true);
 
-    const loadAuctions = async (showLoader = true) => {
+    const [refreshing, setRefreshing] =
+        useState(false);
+
+    const [error, setError] =
+        useState("");
+
+    const [message, setMessage] =
+        useState("");
+
+    const [filter, setFilter] =
+        useState("all");
+
+    const loadAuctions = async (
+        showLoader = true
+    ) => {
 
         try {
 
@@ -40,7 +54,8 @@ const ManageAuction = () => {
 
             setError("");
 
-            const data = await getAuctions();
+            const data =
+                await getAuctions();
 
             const auctionList =
                 Array.isArray(data)
@@ -48,7 +63,9 @@ const ManageAuction = () => {
                     : data.auctions || [];
 
             setAuctions(
-                Array.isArray(auctionList)
+                Array.isArray(
+                    auctionList
+                )
                     ? auctionList
                     : []
             );
@@ -56,7 +73,8 @@ const ManageAuction = () => {
         } catch (error) {
 
             setError(
-                error.response?.data?.message ||
+                error.response?.data
+                    ?.message ||
                 "Failed to load auctions."
             );
 
@@ -69,11 +87,9 @@ const ManageAuction = () => {
 
     };
 
-
     useEffect(() => {
         loadAuctions();
     }, []);
-
 
     const handleRefresh = async () => {
 
@@ -83,89 +99,202 @@ const ManageAuction = () => {
 
     };
 
+    const handleApproveAuction =
+        async (id) => {
 
-    const handleEndAuction = async (id) => {
+            const confirmApprove =
+                window.confirm(
+                    "Are you sure you want to approve this auction?"
+                );
 
-        const confirmEnd =
-            window.confirm(
-                "Are you sure you want to end this auction?"
-            );
+            if (!confirmApprove) {
+                return;
+            }
 
-        if (!confirmEnd) {
-            return;
-        }
+            try {
 
+                setError("");
+                setMessage("");
 
-        try {
+                await approveAuction(id);
 
-            setError("");
-            setMessage("");
+                setMessage(
+                    "Auction approved successfully."
+                );
 
-            await endAuction(id);
+                await loadAuctions(false);
 
-            setMessage(
-                "Auction ended successfully."
-            );
+            } catch (error) {
 
-            await loadAuctions(false);
+                setError(
+                    error.response?.data
+                        ?.message ||
+                    "Failed to approve auction."
+                );
 
-        } catch (error) {
+            }
 
-            setError(
-                error.response?.data?.message ||
-                "Failed to end auction."
-            );
+        };
 
-        }
+    const handleRejectAuction =
+        async (id) => {
 
-    };
+            const confirmReject =
+                window.confirm(
+                    "Are you sure you want to reject this auction?"
+                );
 
+            if (!confirmReject) {
+                return;
+            }
 
-    const getStatusClass = (status) => {
+            try {
 
-        if (status === "active") {
-            return "status-active";
-        }
+                setError("");
+                setMessage("");
 
-        if (status === "upcoming") {
-            return "status-upcoming";
-        }
+                await rejectAuction(id);
 
-        if (status === "ended") {
-            return "status-ended";
-        }
+                setMessage(
+                    "Auction rejected successfully."
+                );
 
-        if (status === "cancelled") {
-            return "status-cancelled";
-        }
+                await loadAuctions(false);
 
-        return "status-other";
+            } catch (error) {
 
-    };
+                setError(
+                    error.response?.data
+                        ?.message ||
+                    "Failed to reject auction."
+                );
 
+            }
 
-    const getStatusLabel = (status) => {
+        };
 
-        if (status === "active") {
-            return "Active";
-        }
+    const handleEndAuction =
+        async (id) => {
 
-        if (status === "upcoming") {
-            return "Upcoming";
-        }
+            const confirmEnd =
+                window.confirm(
+                    "Are you sure you want to end this auction?"
+                );
 
-        if (status === "ended") {
-            return "Ended";
-        }
+            if (!confirmEnd) {
+                return;
+            }
 
-        if (status === "cancelled") {
-            return "Cancelled";
-        }
+            try {
 
-        return "Unknown";
+                setError("");
+                setMessage("");
 
-    };
+                await endAuction(id);
 
+                setMessage(
+                    "Auction ended successfully."
+                );
+
+                await loadAuctions(false);
+
+            } catch (error) {
+
+                setError(
+                    error.response?.data
+                        ?.message ||
+                    "Failed to end auction."
+                );
+
+            }
+
+        };
+
+    const getStatusClass =
+        (status) => {
+
+            if (
+                status === "active"
+            ) {
+                return "status-active";
+            }
+
+            if (
+                status === "upcoming"
+            ) {
+                return "status-upcoming";
+            }
+
+            if (
+                status === "pending"
+            ) {
+                return "status-upcoming";
+            }
+
+            if (
+                status === "ended"
+            ) {
+                return "status-ended";
+            }
+
+            if (
+                status === "cancelled"
+            ) {
+                return "status-cancelled";
+            }
+
+            if (
+                status === "rejected"
+            ) {
+                return "status-cancelled";
+            }
+
+            return "status-other";
+
+        };
+
+    const getStatusLabel =
+        (status) => {
+
+            if (
+                status === "active"
+            ) {
+                return "Active";
+            }
+
+            if (
+                status === "upcoming"
+            ) {
+                return "Upcoming";
+            }
+
+            if (
+                status === "pending"
+            ) {
+                return "Pending Approval";
+            }
+
+            if (
+                status === "ended"
+            ) {
+                return "Ended";
+            }
+
+            if (
+                status === "cancelled"
+            ) {
+                return "Cancelled";
+            }
+
+            if (
+                status === "rejected"
+            ) {
+                return "Rejected";
+            }
+
+            return "Unknown";
+
+        };
 
     const formatDate = (date) => {
 
@@ -194,7 +323,6 @@ const ManageAuction = () => {
 
     };
 
-
     const formatPrice = (price) => {
 
         return `₹${Number(
@@ -203,43 +331,56 @@ const ManageAuction = () => {
 
     };
 
-
     const filteredAuctions =
         filter === "all"
             ? auctions
             : auctions.filter(
                 (auction) =>
-                    auction.status === filter
+                    auction.status ===
+                    filter
             );
 
+    const pendingCount =
+        auctions.filter(
+            (auction) =>
+                auction.status ===
+                "pending"
+        ).length;
 
     const activeCount =
         auctions.filter(
             (auction) =>
-                auction.status === "active"
+                auction.status ===
+                "active"
         ).length;
-
 
     const upcomingCount =
         auctions.filter(
             (auction) =>
-                auction.status === "upcoming"
+                auction.status ===
+                "upcoming"
         ).length;
-
 
     const endedCount =
         auctions.filter(
             (auction) =>
-                auction.status === "ended"
+                auction.status ===
+                "ended"
         ).length;
-
 
     const cancelledCount =
         auctions.filter(
             (auction) =>
-                auction.status === "cancelled"
+                auction.status ===
+                "cancelled"
         ).length;
 
+    const rejectedCount =
+        auctions.filter(
+            (auction) =>
+                auction.status ===
+                "rejected"
+        ).length;
 
     if (loading) {
 
@@ -250,7 +391,6 @@ const ManageAuction = () => {
         );
 
     }
-
 
     return (
 
@@ -269,19 +409,23 @@ const ManageAuction = () => {
                     </h1>
 
                     <p>
-                        Monitor seller auctions,
-                        current bids, winners and
-                        auction status.
+                        Review seller auction
+                        requests, approve or
+                        reject auctions, and
+                        monitor auction activity.
                     </p>
 
                 </div>
 
-
                 <button
                     type="button"
                     className="btn btn-secondary"
-                    onClick={handleRefresh}
-                    disabled={refreshing}
+                    onClick={
+                        handleRefresh
+                    }
+                    disabled={
+                        refreshing
+                    }
                 >
 
                     {refreshing
@@ -292,20 +436,17 @@ const ManageAuction = () => {
 
             </div>
 
-
             {error && (
                 <ErrorMessage
                     message={error}
                 />
             )}
 
-
             {message && (
                 <div className="success-message">
                     {message}
                 </div>
             )}
-
 
             <div className="dashboard-grid">
 
@@ -321,6 +462,17 @@ const ManageAuction = () => {
 
                 </div>
 
+                <div className="dashboard-card">
+
+                    <h2>
+                        ⏳ Pending
+                    </h2>
+
+                    <p>
+                        {pendingCount}
+                    </p>
+
+                </div>
 
                 <div className="dashboard-card">
 
@@ -334,7 +486,6 @@ const ManageAuction = () => {
 
                 </div>
 
-
                 <div className="dashboard-card">
 
                     <h2>
@@ -346,7 +497,6 @@ const ManageAuction = () => {
                     </p>
 
                 </div>
-
 
                 <div className="dashboard-card">
 
@@ -362,7 +512,6 @@ const ManageAuction = () => {
 
             </div>
 
-
             <div
                 className="page-header"
                 style={{
@@ -377,14 +526,14 @@ const ManageAuction = () => {
                     </h2>
 
                     <p>
-                        Filter auctions by their
-                        current status.
+                        Review requests and
+                        manage auctions by
+                        their current status.
                     </p>
 
                 </div>
 
             </div>
-
 
             <div
                 className="table-actions"
@@ -410,6 +559,21 @@ const ManageAuction = () => {
                     All ({auctions.length})
                 </button>
 
+                <button
+                    type="button"
+                    className={
+                        filter === "pending"
+                            ? "btn btn-primary"
+                            : "btn btn-secondary"
+                    }
+                    onClick={() =>
+                        setFilter(
+                            "pending"
+                        )
+                    }
+                >
+                    Pending ({pendingCount})
+                </button>
 
                 <button
                     type="button"
@@ -419,12 +583,13 @@ const ManageAuction = () => {
                             : "btn btn-secondary"
                     }
                     onClick={() =>
-                        setFilter("active")
+                        setFilter(
+                            "active"
+                        )
                     }
                 >
                     Active ({activeCount})
                 </button>
-
 
                 <button
                     type="button"
@@ -434,12 +599,13 @@ const ManageAuction = () => {
                             : "btn btn-secondary"
                     }
                     onClick={() =>
-                        setFilter("upcoming")
+                        setFilter(
+                            "upcoming"
+                        )
                     }
                 >
                     Upcoming ({upcomingCount})
                 </button>
-
 
                 <button
                     type="button"
@@ -449,12 +615,13 @@ const ManageAuction = () => {
                             : "btn btn-secondary"
                     }
                     onClick={() =>
-                        setFilter("ended")
+                        setFilter(
+                            "ended"
+                        )
                     }
                 >
                     Ended ({endedCount})
                 </button>
-
 
                 <button
                     type="button"
@@ -464,16 +631,34 @@ const ManageAuction = () => {
                             : "btn btn-secondary"
                     }
                     onClick={() =>
-                        setFilter("cancelled")
+                        setFilter(
+                            "cancelled"
+                        )
                     }
                 >
                     Cancelled ({cancelledCount})
                 </button>
 
+                <button
+                    type="button"
+                    className={
+                        filter === "rejected"
+                            ? "btn btn-primary"
+                            : "btn btn-secondary"
+                    }
+                    onClick={() =>
+                        setFilter(
+                            "rejected"
+                        )
+                    }
+                >
+                    Rejected ({rejectedCount})
+                </button>
+
             </div>
 
-
-            {filteredAuctions.length === 0 ? (
+            {filteredAuctions.length ===
+            0 ? (
 
                 <div className="empty-state">
 
@@ -512,7 +697,7 @@ const ManageAuction = () => {
                                 </th>
 
                                 <th>
-                                    Current Price
+                                    Current / End Bid
                                 </th>
 
                                 <th>
@@ -539,21 +724,34 @@ const ManageAuction = () => {
 
                         </thead>
 
-
                         <tbody>
 
                             {filteredAuctions.map(
                                 (auction) => {
 
                                     const image =
-                                        auction.product
+                                        auction
+                                            .product
                                             ?.images
-                                            ?.length > 0
+                                            ?.length >
+                                        0
                                             ? auction
                                                 .product
                                                 .images[0]
                                             : null;
 
+                                    const isEnded =
+                                        auction.status ===
+                                        "ended";
+
+                                    const hasWinner =
+                                        Boolean(
+                                            auction.winner
+                                        );
+
+                                    const isPending =
+                                        auction.status ===
+                                        "pending";
 
                                     return (
 
@@ -570,14 +768,18 @@ const ManageAuction = () => {
                                                     {image ? (
 
                                                         <img
-                                                            src={image}
+                                                            src={
+                                                                image
+                                                            }
                                                             alt={
                                                                 auction
                                                                     .product
                                                                     ?.name ||
                                                                 "Product"
                                                             }
-                                                            onError={(event) => {
+                                                            onError={(
+                                                                event
+                                                            ) => {
 
                                                                 event
                                                                     .currentTarget
@@ -592,21 +794,28 @@ const ManageAuction = () => {
 
                                                         <div
                                                             style={{
-                                                                width: "55px",
-                                                                height: "55px",
-                                                                display: "flex",
-                                                                alignItems: "center",
-                                                                justifyContent: "center",
-                                                                borderRadius: "10px",
-                                                                background: "#eef2ff",
-                                                                fontSize: "24px"
+                                                                width:
+                                                                    "55px",
+                                                                height:
+                                                                    "55px",
+                                                                display:
+                                                                    "flex",
+                                                                alignItems:
+                                                                    "center",
+                                                                justifyContent:
+                                                                    "center",
+                                                                borderRadius:
+                                                                    "10px",
+                                                                background:
+                                                                    "#eef2ff",
+                                                                fontSize:
+                                                                    "24px"
                                                             }}
                                                         >
                                                             📦
                                                         </div>
 
                                                     )}
-
 
                                                     <span>
                                                         {
@@ -621,7 +830,6 @@ const ManageAuction = () => {
 
                                             </td>
 
-
                                             <td>
                                                 {
                                                     auction
@@ -631,20 +839,25 @@ const ManageAuction = () => {
                                                 }
                                             </td>
 
-
                                             <td>
                                                 {formatPrice(
                                                     auction.startingPrice
                                                 )}
                                             </td>
 
-
                                             <td>
-                                                {formatPrice(
-                                                    auction.currentPrice
-                                                )}
-                                            </td>
 
+                                                {isEnded
+                                                    ? hasWinner
+                                                        ? formatPrice(
+                                                              auction.currentPrice
+                                                          )
+                                                        : "No Bid"
+                                                    : formatPrice(
+                                                          auction.currentPrice
+                                                      )}
+
+                                            </td>
 
                                             <td>
                                                 {formatDate(
@@ -652,13 +865,11 @@ const ManageAuction = () => {
                                                 )}
                                             </td>
 
-
                                             <td>
                                                 {formatDate(
                                                     auction.endTime
                                                 )}
                                             </td>
-
 
                                             <td>
                                                 {
@@ -668,7 +879,6 @@ const ManageAuction = () => {
                                                     "No Winner"
                                                 }
                                             </td>
-
 
                                             <td>
 
@@ -684,33 +894,71 @@ const ManageAuction = () => {
 
                                             </td>
 
-
                                             <td>
 
                                                 <div className="table-actions">
 
-                                                    <Link
-                                                        to={`/buyer/auctions/${auction._id}`}
-                                                        className="btn btn-secondary"
-                                                    >
-                                                        View
-                                                    </Link>
+                                                    {isPending ? (
 
+                                                        <>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-primary"
+                                                                onClick={() =>
+                                                                    handleApproveAuction(
+                                                                        auction._id
+                                                                    )
+                                                                }
+                                                            >
+                                                                Approve
+                                                            </button>
 
-                                                    {auction.status ===
-                                                        "active" && (
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-danger"
+                                                                onClick={() =>
+                                                                    handleRejectAuction(
+                                                                        auction._id
+                                                                    )
+                                                                }
+                                                            >
+                                                                Reject
+                                                            </button>
+                                                        </>
 
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-danger"
-                                                            onClick={() =>
-                                                                handleEndAuction(
-                                                                    auction._id
-                                                                )
-                                                            }
-                                                        >
-                                                            End Auction
-                                                        </button>
+                                                    ) : (
+
+                                                        <>
+                                                            {!(
+                                                                auction.status ===
+                                                                "rejected"
+                                                            ) && (
+                                                                <Link
+                                                                    to={`/buyer/auctions/${auction._id}`}
+                                                                    className="btn btn-secondary"
+                                                                >
+                                                                    View
+                                                                </Link>
+                                                            )}
+
+                                                            {auction.status ===
+                                                                "active" && (
+
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn btn-danger"
+                                                                    onClick={() =>
+                                                                        handleEndAuction(
+                                                                            auction._id
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    End Auction
+                                                                </button>
+
+                                                            )}
+
+                                                        </>
 
                                                     )}
 
@@ -738,6 +986,5 @@ const ManageAuction = () => {
     );
 
 };
-
 
 export default ManageAuction;

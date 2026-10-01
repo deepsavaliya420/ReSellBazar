@@ -22,6 +22,14 @@ export const getMyOrders = async () => {
 };
 
 
+export const getSellerOrders = async () => {
+    const response =
+        await api.get("/orders/seller");
+
+    return response.data;
+};
+
+
 export const getAllOrders = async () => {
     const response =
         await api.get("/orders/all");

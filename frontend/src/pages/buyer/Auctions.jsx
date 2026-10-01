@@ -211,6 +211,15 @@ const Auctions = () => {
                                 auction.product
                                     ?.images?.[0];
 
+                            const isEnded =
+                                auction.status ===
+                                "ended";
+
+                            const hasWinner =
+                                Boolean(
+                                    auction.winner
+                                );
+
                             return (
                                 <article
                                     className="auction-card"
@@ -294,14 +303,18 @@ const Auctions = () => {
 
                                             <div>
                                                 <span>
-                                                    Current Bid
+                                                    {isEnded
+                                                        ? "End Bid"
+                                                        : "Current Bid"}
                                                 </span>
 
                                                 <strong className="auction-current-price">
-                                                    ₹
-                                                    {formatPrice(
-                                                        auction.currentPrice
-                                                    )}
+                                                    {isEnded &&
+                                                    !hasWinner
+                                                        ? "No Bid"
+                                                        : `₹${formatPrice(
+                                                              auction.currentPrice
+                                                          )}`}
                                                 </strong>
                                             </div>
 

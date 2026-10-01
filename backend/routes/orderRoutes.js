@@ -1,20 +1,29 @@
 const express = require("express");
 
-const router = express.Router();
+const router =
+    express.Router();
 
 const {
     createOrder,
     getMyOrders,
+    getSellerOrders,
     getAllOrders,
     updateOrderStatus,
     updateDelivery
-} = require("../controllers/orderController");
+} =
+    require(
+        "../controllers/orderController"
+    );
 
 const authMiddleware =
-    require("../middleware/authMiddleware");
+    require(
+        "../middleware/authMiddleware"
+    );
 
 const authorizeRoles =
-    require("../middleware/roleMiddleware");
+    require(
+        "../middleware/roleMiddleware"
+    );
 
 
 router.post(
@@ -34,6 +43,14 @@ router.get(
 
 
 router.get(
+    "/seller",
+    authMiddleware,
+    authorizeRoles("seller"),
+    getSellerOrders
+);
+
+
+router.get(
     "/all",
     authMiddleware,
     authorizeRoles("admin"),
@@ -44,7 +61,10 @@ router.get(
 router.put(
     "/:id/status",
     authMiddleware,
-    authorizeRoles("admin", "seller"),
+    authorizeRoles(
+        "admin",
+        "seller"
+    ),
     updateOrderStatus
 );
 

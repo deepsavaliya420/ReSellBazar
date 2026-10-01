@@ -23,21 +23,25 @@ const CreateAuction = () => {
 
     const { user } = useAuth();
 
-    const [products, setProducts] = useState([]);
+    const [products, setProducts] =
+        useState([]);
 
-    const [error, setError] = useState("");
+    const [error, setError] =
+        useState("");
 
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] =
+        useState(false);
 
     const [productsLoading, setProductsLoading] =
         useState(true);
 
-    const [formData, setFormData] = useState({
-        product: "",
-        startingPrice: "",
-        startTime: "",
-        endTime: ""
-    });
+    const [formData, setFormData] =
+        useState({
+            product: "",
+            startingPrice: "",
+            startTime: "",
+            endTime: ""
+        });
 
     useEffect(() => {
         const loadProducts = async () => {
@@ -45,7 +49,8 @@ const CreateAuction = () => {
                 setProductsLoading(true);
                 setError("");
 
-                const data = await getProducts();
+                const data =
+                    await getProducts();
 
                 const list =
                     data.products ||
@@ -57,27 +62,31 @@ const CreateAuction = () => {
                     user?._id;
 
                 const sellerProducts =
-                    list.filter((product) => {
-                        const seller =
-                            product.seller;
+                    list.filter(
+                        (product) => {
+                            const seller =
+                                product.seller;
 
-                        const sellerId =
-                            typeof seller === "object"
-                                ? seller?._id
-                                : seller;
+                            const sellerId =
+                                typeof seller ===
+                                "object"
+                                    ? seller?._id
+                                    : seller;
 
-                        return (
-                            sellerId ===
-                            currentUserId
-                        );
-                    });
+                            return (
+                                sellerId ===
+                                currentUserId
+                            );
+                        }
+                    );
 
                 setProducts(
                     sellerProducts
                 );
             } catch (error) {
                 setError(
-                    error.response?.data?.message ||
+                    error.response?.data
+                        ?.message ||
                     "Failed to load products."
                 );
             } finally {
@@ -117,6 +126,7 @@ const CreateAuction = () => {
             setError(
                 "Please fill all fields."
             );
+
             return;
         }
 
@@ -124,6 +134,7 @@ const CreateAuction = () => {
             setError(
                 "Starting price must be greater than ₹0."
             );
+
             return;
         }
 
@@ -143,6 +154,7 @@ const CreateAuction = () => {
             setError(
                 "Start time must be in the future."
             );
+
             return;
         }
 
@@ -150,6 +162,7 @@ const CreateAuction = () => {
             setError(
                 "End time must be after start time."
             );
+
             return;
         }
 
@@ -174,8 +187,9 @@ const CreateAuction = () => {
             );
         } catch (error) {
             setError(
-                error.response?.data?.message ||
-                "Failed to create auction."
+                error.response?.data
+                    ?.message ||
+                "Failed to submit auction for approval."
             );
         } finally {
             setLoading(false);
@@ -219,7 +233,9 @@ const CreateAuction = () => {
 
                 <form
                     className="create-auction-form"
-                    onSubmit={handleSubmit}
+                    onSubmit={
+                        handleSubmit
+                    }
                 >
 
                     <div className="auction-form-section">
@@ -412,15 +428,16 @@ const CreateAuction = () => {
                         <div>
 
                             <strong>
-                                How it works
+                                Admin Approval Required
                             </strong>
 
                             <p>
-                                Buyers will bid above
-                                your starting price.
-                                The highest bidder when
-                                the auction ends becomes
-                                the winner.
+                                Your auction will first
+                                be submitted for admin
+                                approval. It will only
+                                become available for
+                                buyers after an admin
+                                approves it.
                             </p>
 
                         </div>
@@ -436,8 +453,8 @@ const CreateAuction = () => {
                         }
                     >
                         {loading
-                            ? "Creating Auction..."
-                            : "🔨 Create Auction"}
+                            ? "Submitting..."
+                            : "🔨 Submit for Approval"}
                     </button>
 
                 </form>

@@ -11,11 +11,34 @@ export const getAuctionById = async (id) => {
 };
 
 export const createAuction = async (auctionData) => {
-    const response = await api.post("/auctions", auctionData);
+    const response = await api.post(
+        "/auctions",
+        auctionData
+    );
+
+    return response.data;
+};
+
+export const approveAuction = async (id) => {
+    const response = await api.put(
+        `/auctions/${id}/approve`
+    );
+
+    return response.data;
+};
+
+export const rejectAuction = async (id) => {
+    const response = await api.put(
+        `/auctions/${id}/reject`
+    );
+
     return response.data;
 };
 
 export const endAuction = async (id) => {
-    const response = await api.put(`/auctions/${id}/end`);
+    const response = await api.put(
+        `/auctions/${id}/end`
+    );
+
     return response.data;
 };

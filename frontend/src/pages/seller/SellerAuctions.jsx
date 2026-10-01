@@ -16,45 +16,58 @@ import "../../styles/auction.css";
 const SellerAuctions = () => {
     const { user } = useAuth();
 
-    const [auctions, setAuctions] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const [auctions, setAuctions] =
+        useState([]);
+
+    const [loading, setLoading] =
+        useState(true);
+
+    const [error, setError] =
+        useState("");
 
     const loadAuctions = async () => {
         try {
             setLoading(true);
             setError("");
 
-            const data = await getAuctions();
+            const data =
+                await getAuctions();
 
-            const list = Array.isArray(data)
-                ? data
-                : data.auctions || [];
+            const list =
+                Array.isArray(data)
+                    ? data
+                    : data.auctions || [];
 
             const sellerId =
-                user?.id || user?._id;
+                user?.id ||
+                user?._id;
 
-            const sellerAuctions = list.filter(
-                (auction) => {
-                    const seller =
-                        auction.seller;
+            const sellerAuctions =
+                list.filter(
+                    (auction) => {
+                        const seller =
+                            auction.seller;
 
-                    const sellerIdFromAuction =
-                        typeof seller === "object"
-                            ? seller?._id
-                            : seller;
+                        const sellerIdFromAuction =
+                            typeof seller ===
+                            "object"
+                                ? seller?._id
+                                : seller;
 
-                    return (
-                        sellerIdFromAuction ===
-                        sellerId
-                    );
-                }
+                        return (
+                            sellerIdFromAuction ===
+                            sellerId
+                        );
+                    }
+                );
+
+            setAuctions(
+                sellerAuctions
             );
-
-            setAuctions(sellerAuctions);
         } catch (error) {
             setError(
-                error.response?.data?.message ||
+                error.response?.data
+                    ?.message ||
                 "Failed to load auctions."
             );
         } finally {
@@ -69,9 +82,10 @@ const SellerAuctions = () => {
     }, [user]);
 
     const handleEnd = async (id) => {
-        const confirmEnd = window.confirm(
-            "Are you sure you want to end this auction?"
-        );
+        const confirmEnd =
+            window.confirm(
+                "Are you sure you want to end this auction?"
+            );
 
         if (!confirmEnd) {
             return;
@@ -85,7 +99,8 @@ const SellerAuctions = () => {
             await loadAuctions();
         } catch (error) {
             setError(
-                error.response?.data?.message ||
+                error.response?.data
+                    ?.message ||
                 "Failed to end auction."
             );
         }
@@ -93,21 +108,37 @@ const SellerAuctions = () => {
 
     const getStatusClass = (status) => {
         if (status === "active") {
-            return "auction-status-live";
+            return "seller-auction-status-live";
         }
 
         if (status === "upcoming") {
-            return "auction-status-upcoming";
+            return "seller-auction-status-upcoming";
         }
 
         if (status === "ended") {
-            return "auction-status-ended";
+            return "seller-auction-status-ended";
         }
 
-        return "auction-status-cancelled";
+        if (status === "pending") {
+            return "seller-auction-status-pending";
+        }
+
+        if (status === "rejected") {
+            return "seller-auction-status-rejected";
+        }
+
+        if (status === "cancelled") {
+            return "seller-auction-status-cancelled";
+        }
+
+        return "seller-auction-status-default";
     };
 
     const getStatusText = (status) => {
+        if (status === "pending") {
+            return "⏳ Pending Approval";
+        }
+
         if (status === "active") {
             return "🔴 Live";
         }
@@ -118,6 +149,10 @@ const SellerAuctions = () => {
 
         if (status === "ended") {
             return "✓ Ended";
+        }
+
+        if (status === "rejected") {
+            return "✕ Rejected";
         }
 
         if (status === "cancelled") {
@@ -161,7 +196,9 @@ const SellerAuctions = () => {
 
             </div>
 
-            <ErrorMessage message={error} />
+            <ErrorMessage
+                message={error}
+            />
 
             {auctions.length === 0 ? (
 
@@ -195,197 +232,258 @@ const SellerAuctions = () => {
 
                 <div className="seller-auction-grid">
 
-                    {auctions.map((auction) => {
+                    {auctions.map(
+                        (auction) => {
 
-                        const product =
-                            auction.product || {};
+                            const product =
+                                auction.product ||
+                                {};
 
-                        const image =
-                            product.images?.length > 0
-                                ? product.images[0]
-                                : null;
+                            const image =
+                                product.images
+                                    ?.length > 0
+                                    ? product.images[0]
+                                    : null;
 
-                        return (
-                            <div
-                                className="seller-auction-card"
-                                key={auction._id}
-                            >
+                            const isEnded =
+                                auction.status ===
+                                "ended";
 
-                                <div className="seller-auction-image">
+                            const hasWinner =
+                                Boolean(
+                                    auction.winner
+                                );
 
-                                    {image ? (
-                                        <img
-                                            src={image}
-                                            alt={
-                                                product.name ||
-                                                "Auction Product"
-                                            }
-                                            onError={(event) => {
-                                                event.currentTarget.style.display =
-                                                    "none";
+                            const isPending =
+                                auction.status ===
+                                "pending";
 
-                                                if (
-                                                    event.currentTarget
-                                                        .nextElementSibling
-                                                ) {
-                                                    event.currentTarget
-                                                        .nextElementSibling
-                                                        .style.display =
-                                                        "flex";
+                            const isRejected =
+                                auction.status ===
+                                "rejected";
+
+                            return (
+                                <div
+                                    className="seller-auction-card"
+                                    key={
+                                        auction._id
+                                    }
+                                >
+
+                                    {/* PRODUCT IMAGE */}
+                                    <div className="seller-auction-image">
+
+                                        {image ? (
+                                            <img
+                                                src={
+                                                    image
                                                 }
-                                            }}
-                                        />
-                                    ) : null}
+                                                alt={
+                                                    product.name ||
+                                                    "Auction Product"
+                                                }
+                                                onError={(
+                                                    event
+                                                ) => {
+                                                    event
+                                                        .currentTarget
+                                                        .style
+                                                        .display =
+                                                        "none";
 
-                                    <div
-                                        className="seller-auction-image-fallback"
-                                        style={{
-                                            display: image
-                                                ? "none"
-                                                : "flex"
-                                        }}
-                                    >
-                                        🏷️
-                                    </div>
-
-                                    <span
-                                        className={`seller-auction-status ${getStatusClass(
-                                            auction.status
-                                        )}`}
-                                    >
-                                        {getStatusText(
-                                            auction.status
-                                        )}
-                                    </span>
-
-                                </div>
-
-                                <div className="seller-auction-content">
-
-                                    <span className="seller-auction-label">
-                                        AUCTION ITEM
-                                    </span>
-
-                                    <h2>
-                                        {product.name ||
-                                            "Product"}
-                                    </h2>
-
-                                    <div className="seller-auction-price-box">
-
-                                        <div>
-                                            <span>
-                                                Starting Price
-                                            </span>
-
-                                            <strong>
-                                                ₹
-                                                {Number(
-                                                    auction.startingPrice ||
-                                                    0
-                                                ).toLocaleString(
-                                                    "en-IN"
-                                                )}
-                                            </strong>
-                                        </div>
-
-                                        <div>
-                                            <span>
-                                                Current Bid
-                                            </span>
-
-                                            <strong>
-                                                ₹
-                                                {Number(
-                                                    auction.currentPrice ||
-                                                    0
-                                                ).toLocaleString(
-                                                    "en-IN"
-                                                )}
-                                            </strong>
-                                        </div>
-
-                                    </div>
-
-                                    <div className="seller-auction-info">
-
-                                        <div>
-                                            <span>
-                                                🕐 Start
-                                            </span>
-
-                                            <strong>
-                                                {auction.startTime
-                                                    ? new Date(
-                                                          auction.startTime
-                                                      ).toLocaleString(
-                                                          "en-IN"
-                                                      )
-                                                    : "Not available"}
-                                            </strong>
-                                        </div>
-
-                                        <div>
-                                            <span>
-                                                ⏰ End
-                                            </span>
-
-                                            <strong>
-                                                {auction.endTime
-                                                    ? new Date(
-                                                          auction.endTime
-                                                      ).toLocaleString(
-                                                          "en-IN"
-                                                      )
-                                                    : "Not available"}
-                                            </strong>
-                                        </div>
-
-                                    </div>
-
-                                    <div className="seller-auction-winner">
-
-                                        <span>
-                                            🏆 Winner
-                                        </span>
-
-                                        <strong>
-                                            {auction.winner?.name ||
-                                                "No winner yet"}
-                                        </strong>
-
-                                    </div>
-
-                                    <div className="seller-auction-actions">
-
-                                        <Link
-                                            to={`/buyer/auctions/${auction._id}`}
-                                            className="auction-view-button"
-                                        >
-                                            View Auction →
-                                        </Link>
-
-                                        {auction.status !== "ended" &&
-                                            auction.status !== "cancelled" && (
-                                                <button
-                                                    className="auction-end-button"
-                                                    onClick={() =>
-                                                        handleEnd(
-                                                            auction._id
-                                                        )
+                                                    if (
+                                                        event
+                                                            .currentTarget
+                                                            .nextElementSibling
+                                                    ) {
+                                                        event
+                                                            .currentTarget
+                                                            .nextElementSibling
+                                                            .style
+                                                            .display =
+                                                            "flex";
                                                     }
-                                                >
-                                                    End Auction
-                                                </button>
-                                            )}
+                                                }}
+                                            />
+                                        ) : null}
+
+                                        <div
+                                            className="seller-auction-image-fallback"
+                                            style={{
+                                                display:
+                                                    image
+                                                        ? "none"
+                                                        : "flex"
+                                            }}
+                                        >
+                                            🏷️
+                                        </div>
+
+                                    </div>
+
+                                    {/* AUCTION DETAILS */}
+                                    <div className="seller-auction-content">
+
+                                        <div className="seller-auction-top-row">
+
+                                            <span className="seller-auction-label">
+                                                AUCTION ITEM
+                                            </span>
+
+                                            <span
+                                                className={`seller-auction-status ${getStatusClass(
+                                                    auction.status
+                                                )}`}
+                                            >
+                                                {getStatusText(
+                                                    auction.status
+                                                )}
+                                            </span>
+
+                                        </div>
+
+                                        <h2>
+                                            {product.name ||
+                                                "Product"}
+                                        </h2>
+
+                                        <div className="seller-auction-price-box">
+
+                                            <div>
+                                                <span>
+                                                    Starting Price
+                                                </span>
+
+                                                <strong>
+                                                    ₹
+                                                    {Number(
+                                                        auction.startingPrice ||
+                                                        0
+                                                    ).toLocaleString(
+                                                        "en-IN"
+                                                    )}
+                                                </strong>
+                                            </div>
+
+                                            <div>
+                                                <span>
+                                                    {isEnded
+                                                        ? "End Bid"
+                                                        : "Current Bid"}
+                                                </span>
+
+                                                <strong>
+                                                    {isEnded &&
+                                                    !hasWinner
+                                                        ? "No Bid"
+                                                        : `₹${Number(
+                                                              auction.currentPrice ||
+                                                              0
+                                                          ).toLocaleString(
+                                                              "en-IN"
+                                                          )}`}
+                                                </strong>
+                                            </div>
+
+                                        </div>
+
+                                        <div className="seller-auction-info">
+
+                                            <div>
+                                                <span>
+                                                    🕐 Start
+                                                </span>
+
+                                                <strong>
+                                                    {auction.startTime
+                                                        ? new Date(
+                                                              auction.startTime
+                                                          ).toLocaleString(
+                                                              "en-IN"
+                                                          )
+                                                        : "Not available"}
+                                                </strong>
+                                            </div>
+
+                                            <div>
+                                                <span>
+                                                    ⏰ End
+                                                </span>
+
+                                                <strong>
+                                                    {auction.endTime
+                                                        ? new Date(
+                                                              auction.endTime
+                                                          ).toLocaleString(
+                                                              "en-IN"
+                                                          )
+                                                        : "Not available"}
+                                                </strong>
+                                            </div>
+
+                                        </div>
+
+                                        <div className="seller-auction-winner">
+
+                                            <span>
+                                                {isPending
+                                                    ? "⏳ Status"
+                                                    : isRejected
+                                                        ? "❌ Status"
+                                                        : "🏆 Winner"}
+                                            </span>
+
+                                            <strong>
+                                                {isPending
+                                                    ? "Waiting for admin approval"
+                                                    : isRejected
+                                                        ? "Auction rejected by admin"
+                                                        : auction.winner?.name ||
+                                                          "No winner yet"}
+                                            </strong>
+
+                                        </div>
+
+                                        <div className="seller-auction-actions">
+
+                                            {!isPending &&
+                                                !isRejected && (
+                                                    <Link
+                                                        to={`/buyer/auctions/${auction._id}`}
+                                                        className="auction-view-button"
+                                                    >
+                                                        View Auction →
+                                                    </Link>
+                                                )}
+
+                                            {auction.status !==
+                                                "ended" &&
+                                                auction.status !==
+                                                    "cancelled" &&
+                                                auction.status !==
+                                                    "pending" &&
+                                                auction.status !==
+                                                    "rejected" && (
+                                                    <button
+                                                        className="auction-end-button"
+                                                        onClick={() =>
+                                                            handleEnd(
+                                                                auction._id
+                                                            )
+                                                        }
+                                                    >
+                                                        End Auction
+                                                    </button>
+                                                )}
+
+                                        </div>
 
                                     </div>
 
                                 </div>
-
-                            </div>
-                        );
-                    })}
+                            );
+                        }
+                    )}
 
                 </div>
             )}

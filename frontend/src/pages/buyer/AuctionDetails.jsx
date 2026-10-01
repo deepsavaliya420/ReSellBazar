@@ -54,9 +54,7 @@ const AuctionDetails = () => {
                 auctionData.auction ||
                 auctionData;
 
-            setAuction(
-                auctionResult
-            );
+            setAuction(auctionResult);
 
             const bidData =
                 await getAuctionBids(id);
@@ -66,7 +64,6 @@ const AuctionDetails = () => {
                     ? bidData
                     : bidData.bids || []
             );
-
         } catch (error) {
             setError(
                 error.response?.data?.message ||
@@ -127,7 +124,6 @@ const AuctionDetails = () => {
             );
 
             await loadData();
-
         } catch (error) {
             setError(
                 error.response?.data?.message ||
@@ -149,9 +145,7 @@ const AuctionDetails = () => {
     if (!auction) {
         return (
             <main className="auction-page">
-
                 <div className="auction-empty">
-
                     <div className="auction-empty-icon">
                         🏷️
                     </div>
@@ -172,9 +166,7 @@ const AuctionDetails = () => {
                     >
                         Back to Auctions
                     </Link>
-
                 </div>
-
             </main>
         );
     }
@@ -196,9 +188,15 @@ const AuctionDetails = () => {
     const isEnded =
         auction.status === "ended";
 
+    const hasWinner =
+        isEnded && !!auction.winner;
+
+    const finalBid = hasWinner
+        ? Number(auction.currentPrice || 0)
+        : 0;
+
     return (
         <main className="auction-page">
-
             <div className="auction-details">
 
                 <Link
@@ -223,7 +221,6 @@ const AuctionDetails = () => {
                     <div className="auction-details-image">
 
                         {image ? (
-
                             <img
                                 src={image}
                                 alt={
@@ -245,7 +242,6 @@ const AuctionDetails = () => {
                                     }
                                 }}
                             />
-
                         ) : null}
 
                         <div
@@ -267,7 +263,9 @@ const AuctionDetails = () => {
                     <div className="auction-details-info">
 
                         <span className="auction-eyebrow">
-                            LIVE AUCTION
+                            {isEnded
+                                ? "AUCTION RESULT"
+                                : "LIVE AUCTION"}
                         </span>
 
                         <h1>
@@ -284,7 +282,6 @@ const AuctionDetails = () => {
                         </p>
 
                         <div className="auction-status-row">
-
                             <span
                                 className={`auction-status ${
                                     isActive
@@ -304,7 +301,6 @@ const AuctionDetails = () => {
                                     ? "✓ Ended"
                                     : "✕ Cancelled"}
                             </span>
-
                         </div>
 
                         <div className="auction-detail-price">
@@ -327,7 +323,9 @@ const AuctionDetails = () => {
 
                             <div>
                                 <span>
-                                    Current Bid
+                                    {isEnded
+                                        ? "Final Bid"
+                                        : "Current Bid"}
                                 </span>
 
                                 <strong>
@@ -380,11 +378,9 @@ const AuctionDetails = () => {
                         </div>
 
                     </div>
-
                 </div>
 
                 {isActive && (
-
                     <div className="bid-form">
 
                         <div>
@@ -406,9 +402,7 @@ const AuctionDetails = () => {
                         <form
                             onSubmit={handleBid}
                         >
-
                             <div className="auction-money-input">
-
                                 <span>
                                     ₹
                                 </span>
@@ -434,7 +428,6 @@ const AuctionDetails = () => {
                                     )}`}
                                     required
                                 />
-
                             </div>
 
                             <button
@@ -448,15 +441,12 @@ const AuctionDetails = () => {
                                     ? "Placing Bid..."
                                     : "🔨 Place Bid"}
                             </button>
-
                         </form>
 
                     </div>
-
                 )}
 
                 {isUpcoming && (
-
                     <div className="auction-form-info">
 
                         <span>
@@ -476,21 +466,60 @@ const AuctionDetails = () => {
                         </div>
 
                     </div>
-
                 )}
 
                 {isEnded && (
-
                     <div className="auction-form-info">
 
                         <span>
-                            🏁
+                            {hasWinner
+                                ? "🏆"
+                                : "🏁"}
                         </span>
 
                         <div>
                             <strong>
-                                Auction has ended
+                                {hasWinner
+                                    ? "Auction Winner Declared"
+                                    : "Auction Ended"}
                             </strong>
+
+                            {hasWinner ? (
+                                <>
+                                    <p>
+                                        🏆 Winner:{" "}
+                                        <strong>
+                                            {auction.winner?.name ||
+                                                "Buyer"}
+                                        </strong>
+                                    </p>
+
+                                    <p>
+                                        💰 Final Bid:{" "}
+                                        <strong>
+                                            ₹
+                                            {finalBid.toLocaleString(
+                                                "en-IN"
+                                            )}
+                                        </strong>
+                                    </p>
+
+                                    {auction.winner?.email && (
+                                        <p>
+                                            📧 Winner Email:{" "}
+                                            <strong>
+                                                {auction.winner.email}
+                                            </strong>
+                                        </p>
+                                    )}
+                                </>
+                            ) : (
+                                <p>
+                                    No bids were placed
+                                    during this auction.
+                                    There is no winner.
+                                </p>
+                            )}
 
                             <p>
                                 No more bids can
@@ -500,7 +529,6 @@ const AuctionDetails = () => {
                         </div>
 
                     </div>
-
                 )}
 
                 <section className="bid-history">
@@ -527,7 +555,6 @@ const AuctionDetails = () => {
                     </div>
 
                     {bids.length === 0 ? (
-
                         <div className="auction-empty">
 
                             <div className="auction-empty-icon">
@@ -544,66 +571,57 @@ const AuctionDetails = () => {
                             </p>
 
                         </div>
-
                     ) : (
-
                         <div>
+                            {bids.map(
+                                (bid, index) => (
+                                    <div
+                                        className="bid-card"
+                                        key={bid._id}
+                                    >
 
-                            {bids.map((bid, index) => (
+                                        <div>
+                                            <span>
+                                                #{index + 1}
+                                            </span>
 
-                                <div
-                                    className="bid-card"
-                                    key={bid._id}
-                                >
+                                            <strong>
+                                                {bid.buyer?.name ||
+                                                    "Buyer"}
+                                            </strong>
+                                        </div>
 
-                                    <div>
+                                        <div>
+                                            <strong>
+                                                ₹
+                                                {Number(
+                                                    bid.amount ||
+                                                    0
+                                                ).toLocaleString(
+                                                    "en-IN"
+                                                )}
+                                            </strong>
 
-                                        <span>
-                                            #{index + 1}
-                                        </span>
-
-                                        <strong>
-                                            {bid.buyer?.name ||
-                                                "Buyer"}
-                                        </strong>
-
-                                    </div>
-
-                                    <div>
-
-                                        <strong>
-                                            ₹
-                                            {Number(
-                                                bid.amount ||
-                                                0
-                                            ).toLocaleString(
-                                                "en-IN"
-                                            )}
-                                        </strong>
-
-                                        <small>
-                                            {bid.createdAt
-                                                ? new Date(
-                                                      bid.createdAt
-                                                  ).toLocaleString(
-                                                      "en-IN"
-                                                  )
-                                                : ""}
-                                        </small>
+                                            <small>
+                                                {bid.createdAt
+                                                    ? new Date(
+                                                          bid.createdAt
+                                                      ).toLocaleString(
+                                                          "en-IN"
+                                                      )
+                                                    : ""}
+                                            </small>
+                                        </div>
 
                                     </div>
-
-                                </div>
-
-                            ))}
-
+                                )
+                            )}
                         </div>
                     )}
 
                 </section>
 
             </div>
-
         </main>
     );
 };

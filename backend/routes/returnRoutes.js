@@ -1,14 +1,28 @@
 const express = require("express");
-const router = express.Router();
+
+const router =
+    express.Router();
 
 const {
     createReturn,
     getReturns,
+    getAllReturns,
     updateReturn
-} = require("../controllers/returnController");
+} =
+    require(
+        "../controllers/returnController"
+    );
 
-const authMiddleware = require("../middleware/authMiddleware");
-const authorizeRoles = require("../middleware/roleMiddleware");
+const authMiddleware =
+    require(
+        "../middleware/authMiddleware"
+    );
+
+const authorizeRoles =
+    require(
+        "../middleware/roleMiddleware"
+    );
+
 
 router.post(
     "/",
@@ -17,6 +31,7 @@ router.post(
     createReturn
 );
 
+
 router.get(
     "/my",
     authMiddleware,
@@ -24,11 +39,21 @@ router.get(
     getReturns
 );
 
+
+router.get(
+    "/all",
+    authMiddleware,
+    authorizeRoles("admin"),
+    getAllReturns
+);
+
+
 router.put(
     "/:id",
     authMiddleware,
     authorizeRoles("admin"),
     updateReturn
 );
+
 
 module.exports = router;

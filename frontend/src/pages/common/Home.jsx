@@ -45,27 +45,10 @@ const Home = () => {
                     categoriesData ||
                     [];
 
-                const mainCategories = [
-                    "Electronics",
-                    "Fashion",
-                    "Home & Living",
-                    "Beauty & Health",
-                    "Sports & Fitness",
-                    "Furniture"
-                ];
-
-                const filteredCategories =
-                    Array.isArray(categoryList)
-                        ? categoryList.filter(
-                              (category) =>
-                                  mainCategories.includes(
-                                      category.name
-                                  )
-                          )
-                        : [];
-
                 setCategories(
-                    filteredCategories
+                    Array.isArray(categoryList)
+                        ? categoryList
+                        : []
                 );
             } catch (error) {
                 setError(

@@ -23,27 +23,15 @@ const Categories = () => {
                 const data = await getCategories();
 
                 const categoryList =
-                    data.categories || data || [];
+                    data.categories ||
+                    data ||
+                    [];
 
-                const mainCategories = [
-                    "Electronics",
-                    "Fashion",
-                    "Home & Living",
-                    "Beauty & Health",
-                    "Sports & Fitness",
-                    "Furniture"
-                ];
-
-                const filteredCategories =
+                setCategories(
                     Array.isArray(categoryList)
-                        ? categoryList.filter((category) =>
-                              mainCategories.includes(
-                                  category.name
-                              )
-                          )
-                        : [];
-
-                setCategories(filteredCategories);
+                        ? categoryList
+                        : []
+                );
             } catch (error) {
                 setError(
                     error.response?.data?.message ||
@@ -106,7 +94,10 @@ const Categories = () => {
                 <div className="categories">
                     {categories.map((category) => (
                         <CategoryCard
-                            key={category._id}
+                            key={
+                                category._id ||
+                                category.name
+                            }
                             category={category}
                         />
                     ))}

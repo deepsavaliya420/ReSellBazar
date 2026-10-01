@@ -1,6 +1,7 @@
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 
+
 const createOrder = async (req, res) => {
     try {
         const orderItems = [];
@@ -8,7 +9,9 @@ const createOrder = async (req, res) => {
         for (const item of req.body.items) {
 
             const product =
-                await Product.findById(item.product);
+                await Product.findById(
+                    item.product
+                );
 
             if (!product) {
                 return res.status(404).json({
@@ -16,7 +19,10 @@ const createOrder = async (req, res) => {
                 });
             }
 
-            if (product.quantity < item.quantity) {
+            if (
+                product.quantity <
+                item.quantity
+            ) {
                 return res.status(400).json({
                     message:
                         `Insufficient quantity for ${product.name}`
@@ -35,35 +41,40 @@ const createOrder = async (req, res) => {
             await product.save();
         }
 
-        const totalAmount = orderItems.reduce(
-            (total, item) =>
-                total +
-                item.price * item.quantity,
-            0
-        );
+        const totalAmount =
+            orderItems.reduce(
+                (total, item) =>
+                    total +
+                    item.price *
+                        item.quantity,
+                0
+            );
 
-        const order = await Order.create({
-            buyer: req.user.id,
+        const order =
+            await Order.create({
+                buyer: req.user.id,
 
-            items: orderItems,
+                items: orderItems,
 
-            address: req.body.address,
+                address:
+                    req.body.address,
 
-            totalAmount,
+                totalAmount,
 
-            paymentMethod:
-                req.body.paymentMethod || "cod",
+                paymentMethod:
+                    req.body.paymentMethod ||
+                    "cod",
 
-            delivery: {
-                courier: "",
-                trackingNumber: "",
-                estimatedDelivery: null,
-                shippedAt: null,
-                outForDeliveryAt: null,
-                deliveredAt: null,
-                deliveryNotes: ""
-            }
-        });
+                delivery: {
+                    courier: "",
+                    trackingNumber: "",
+                    estimatedDelivery: null,
+                    shippedAt: null,
+                    outForDeliveryAt: null,
+                    deliveredAt: null,
+                    deliveryNotes: ""
+                }
+            });
 
         res.status(201).json({
             message:
@@ -105,6 +116,99 @@ const getMyOrders = async (req, res) => {
 };
 
 
+/*
+    Get only orders which contain
+    products belonging to the logged-in seller.
+*/
+const getSellerOrders = async (
+    req,
+    res
+) => {
+    try {
+
+        const orders =
+            await Order.find({
+                "items.seller":
+                    req.user.id
+            })
+                .populate(
+                    "buyer",
+                    "name email mobile"
+                )
+                .populate(
+                    "items.product"
+                )
+                .populate(
+                    "items.seller",
+                    "name email"
+                )
+                .populate("address")
+                .sort({
+                    createdAt: -1
+                });
+
+        const sellerOrders =
+            orders.map((order) => {
+
+                const sellerItems =
+                    order.items.filter(
+                        (item) => {
+
+                            const seller =
+                                item.seller;
+
+                            const sellerId =
+                                typeof seller ===
+                                "object"
+                                    ? seller?._id?.toString()
+                                    : seller?.toString();
+
+                            return (
+                                sellerId ===
+                                req.user.id.toString()
+                            );
+                        }
+                    );
+
+                const sellerTotalAmount =
+                    sellerItems.reduce(
+                        (
+                            total,
+                            item
+                        ) =>
+                            total +
+                            Number(
+                                item.price || 0
+                            ) *
+                                Number(
+                                    item.quantity || 0
+                                ),
+                        0
+                    );
+
+                return {
+                    ...order.toObject(),
+
+                    items:
+                        sellerItems,
+
+                    sellerTotalAmount
+                };
+            });
+
+        res.json(sellerOrders);
+
+    } catch (error) {
+
+        res.status(500).json({
+            message:
+                "Failed to get seller orders",
+            error: error.message
+        });
+    }
+};
+
+
 const getAllOrders = async (req, res) => {
     try {
 
@@ -114,8 +218,13 @@ const getAllOrders = async (req, res) => {
                     "buyer",
                     "name email mobile"
                 )
-                .populate("items.product")
-                .populate("items.seller", "name email")
+                .populate(
+                    "items.product"
+                )
+                .populate(
+                    "items.seller",
+                    "name email"
+                )
                 .populate("address");
 
         res.json(orders);
@@ -131,7 +240,10 @@ const getAllOrders = async (req, res) => {
 };
 
 
-const updateOrderStatus = async (req, res) => {
+const updateOrderStatus = async (
+    req,
+    res
+) => {
     try {
 
         const {
@@ -148,7 +260,9 @@ const updateOrderStatus = async (req, res) => {
         ];
 
         if (
-            !validStatuses.includes(status)
+            !validStatuses.includes(
+                status
+            )
         ) {
             return res.status(400).json({
                 message:
@@ -163,13 +277,52 @@ const updateOrderStatus = async (req, res) => {
 
         if (!order) {
             return res.status(404).json({
-                message: "Order not found"
+                message:
+                    "Order not found"
             });
         }
 
-        order.orderStatus = status;
+        /*
+            Sellers can only update an order
+            if at least one item belongs to them.
+        */
+        if (
+            req.user.role === "seller"
+        ) {
 
-        const now = new Date();
+            const sellerOwnsOrder =
+                order.items.some(
+                    (item) => {
+
+                        const seller =
+                            item.seller;
+
+                        const sellerId =
+                            typeof seller ===
+                            "object"
+                                ? seller?._id?.toString()
+                                : seller?.toString();
+
+                        return (
+                            sellerId ===
+                            req.user.id.toString()
+                        );
+                    }
+                );
+
+            if (!sellerOwnsOrder) {
+                return res.status(403).json({
+                    message:
+                        "You are not authorized to update this order"
+                });
+            }
+        }
+
+        order.orderStatus =
+            status;
+
+        const now =
+            new Date();
 
         if (
             status === "shipped"
@@ -179,7 +332,8 @@ const updateOrderStatus = async (req, res) => {
         }
 
         if (
-            status === "out_for_delivery"
+            status ===
+            "out_for_delivery"
         ) {
             order.delivery.outForDeliveryAt =
                 now;
@@ -202,7 +356,9 @@ const updateOrderStatus = async (req, res) => {
                     "buyer",
                     "name email mobile"
                 )
-                .populate("items.product")
+                .populate(
+                    "items.product"
+                )
                 .populate(
                     "items.seller",
                     "name email"
@@ -212,7 +368,8 @@ const updateOrderStatus = async (req, res) => {
         res.json({
             message:
                 "Order status updated",
-            order: updatedOrder
+            order:
+                updatedOrder
         });
 
     } catch (error) {
@@ -226,7 +383,10 @@ const updateOrderStatus = async (req, res) => {
 };
 
 
-const updateDelivery = async (req, res) => {
+const updateDelivery = async (
+    req,
+    res
+) => {
     try {
 
         const {
@@ -243,7 +403,8 @@ const updateDelivery = async (req, res) => {
 
         if (!order) {
             return res.status(404).json({
-                message: "Order not found"
+                message:
+                    "Order not found"
             });
         }
 
@@ -262,7 +423,8 @@ const updateDelivery = async (req, res) => {
         }
 
         if (
-            estimatedDelivery !== undefined
+            estimatedDelivery !==
+            undefined
         ) {
 
             if (
@@ -310,7 +472,9 @@ const updateDelivery = async (req, res) => {
                     "buyer",
                     "name email mobile"
                 )
-                .populate("items.product")
+                .populate(
+                    "items.product"
+                )
                 .populate(
                     "items.seller",
                     "name email"
@@ -320,7 +484,8 @@ const updateDelivery = async (req, res) => {
         res.json({
             message:
                 "Delivery information updated",
-            order: updatedOrder
+            order:
+                updatedOrder
         });
 
     } catch (error) {
@@ -337,6 +502,7 @@ const updateDelivery = async (req, res) => {
 module.exports = {
     createOrder,
     getMyOrders,
+    getSellerOrders,
     getAllOrders,
     updateOrderStatus,
     updateDelivery
